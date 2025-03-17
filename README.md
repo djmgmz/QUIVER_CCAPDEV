@@ -126,7 +126,3 @@ NEXT_PUBLIC_FIREBASE_APP_ID=1:215694210674:web:3497e8eebbc21c1e0c34eb
 4. Access the application:
 Open the browser and accessing localhost:3000
 
-
-
-
-Open the browser and accessing localhost:3000
