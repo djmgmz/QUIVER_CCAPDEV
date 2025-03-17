@@ -1,0 +1,25 @@
+Post phase 2 changelog:
+Keep name of user previewed top left
+Edit/Delete Subquivers 
+Functionality of Popular/Recent
+- Popularity based on (# of combined upvotes + downvotes) / period of time [today, this week, this month]
+Subquivers cant have same names
+Add/Remove your own subquivers
+View Profile
+- Fix issue where signing in to another account/signing out still lets you edit 
+Fix issue when commenting, your comment's username is anonymous before refreshing the page
+Fix issue when editing/deleting a comment; make it say Edit/Delete Comment instead of Edit/Delete Post
+Fix issue where you can only expand/view on posts in subquivers by commenting 
+Fix colors in view profile: Post borders, Highlights for sections (Posts, comments, etc.)
+Add pop-up for trying to interact with post while not signed in
+Add option to go to post from Upvoted/downvoted
+Add reply to comments (can loop indefinitely)
+Add indication for if a post was edited 
+Add indication for if a comment was edited 
+Add description for subquivers
+When clicking on users pictures/usernames should go to user's profile
+Search Quiver
+- Regex to search for posts containing what you're searching for
+- Search subquivers by name
+Cookies
+- Stay on dark mode when refreshing

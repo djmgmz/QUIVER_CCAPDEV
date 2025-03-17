@@ -1,0 +1,393 @@
+import React from "react";
+import { Box, Flex, VStack, Text, Avatar, Tabs, TabList, TabPanels, Tab, TabPanel, HStack, Button, Spinner, Divider, Menu, MenuButton, IconButton, MenuList, MenuItem } from "@chakra-ui/react";
+import { BsThreeDots } from "react-icons/bs";
+import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
+import { FaRegComment } from "react-icons/fa";
+import DeletePost from "@/view/Modal/DeletePost";
+import { NextRouter } from 'next/router';
+
+
+interface ProfileDetailsViewProps {
+  user: {
+    uid: string;
+    username: string;
+    description: string;
+    profilePicture: string | null;
+  };
+  isCurrentUser: boolean;
+  posts: Array<{
+    id: string;
+    title: string;
+    description: string;
+    upvotes: number;
+    downvotes: number;
+    comments: number;
+    community: string;
+    subquiverId: string;
+    postAuthorUsername: string;
+    createdAt: string;
+  }>;
+  comments: Array<{
+    id: string;
+    content: string;
+    createdAt: string;
+    upvotes: number;
+    downvotes: number;
+    postTitle: string;
+    postAuthorUsername: string;
+    subquiverName: string;
+    subquiverId: string;
+    postId: string;
+  }>;
+  upvotedItems: any[];
+  downvotedItems: any[];
+  loading: boolean;
+  commentsLoading: boolean;
+  loadingVotes: boolean;
+  handlePostUpvote: (postId: string, community: string) => void;
+  handlePostDownvote: (postId: string, community: string) => void;
+  handleCommentUpvote: (commentId: string, postId: string, community: string) => void;
+  handleCommentDownvote: (commentId: string, postId: string, community: string) => void;
+  handleDelete: () => void;
+  deleteModal: { open: boolean; postId: string | null };
+  setDeleteModal: (modal: { open: boolean; postId: string | null }) => void;
+  setIsDeletingComment: (value: boolean) => void;
+  setCurrentSubquiverId: (id: string) => void;
+  setParentPostId: (id: string) => void;
+  router: NextRouter;
+}
+
+  const ProfileDetailsView: React.FC<ProfileDetailsViewProps> = ({
+    user,
+    isCurrentUser,
+    posts,
+    comments,
+    upvotedItems,
+    downvotedItems,
+    loading,
+    commentsLoading,
+    loadingVotes,
+    handlePostUpvote,
+    handlePostDownvote,
+    handleCommentUpvote,
+    handleCommentDownvote,
+    handleDelete,
+    deleteModal,
+    setDeleteModal,
+    setIsDeletingComment,
+    setCurrentSubquiverId,
+    setParentPostId,
+    router,
+  }) => {
+    return (
+      <>
+      <Box width="full" position="relative">
+        <Box width="full" height="150px" bg="brand.100" position="relative">
+          <Avatar
+            size="xl"
+            position="absolute"
+            bottom="-40px"
+            left="20px"
+            border="4px solid"
+            borderColor="white"
+            bg="brand.100"
+            src={user.profilePicture || "/images/guestprofilepic.jpeg"}
+          />
+        </Box>
+  
+        <Flex align="center" justify="space-between" mt={1} ml={90} px={10}>
+          <Text color="brand.100" fontSize="40" fontWeight="bold">
+            u/{user.username || "Unknown User"}
+          </Text>
+          {isCurrentUser && (
+            <Button variant="outline" onClick={() => router.push("/profile/edit")}>
+              Edit Profile
+            </Button>
+          )}
+        </Flex>
+  
+        <VStack align="start" spacing={2} mt={2} ml={90} px={10}>
+          <Text fontSize="md" maxW="600px" color="brand.100">
+            {user.description || "No bio available."}
+          </Text>
+        </VStack>
+  
+        <Tabs variant="solid-rounded" colorScheme="gray" align="start" ml={160} mt={8} px={10}>
+          <TabList mb={4}>
+            <HStack spacing={250} align="center">
+              <Tab>Posts</Tab>
+              <Tab>Comments</Tab>
+              <Tab>Upvoted</Tab>
+              <Tab>Downvoted</Tab>
+            </HStack>
+          </TabList>
+  
+          <Divider width="85%" borderColor="brand.100" my={4} />
+  
+          <TabPanels mt={6}>
+          <TabPanel>
+              {loading ? (
+                <Spinner size="xl" />
+              ) : posts.length > 0 ? (
+                posts.map((post) => (
+                  <Box
+                    key={post.id}
+                    p={4}
+                    border="2px solid"
+                    borderColor="black"
+                    borderRadius="lg"
+                    shadow="md"
+                    mt={4}
+                    maxWidth={1130}
+                  >
+                    <HStack justify="space-between" align="start">
+                      <VStack align="start">
+                        <Text fontWeight="bold" color="brand.100">
+                              {post.title}
+                        </Text>
+                        <HStack >
+                          <Avatar size="sm" bg="brand.100" />
+  
+                          <VStack spacing={0} align="start">
+                            <Text fontSize="xs" color="brand.100">
+                              u/{post.postAuthorUsername} in q/{post.community}
+                            </Text>
+                            <Text fontSize="xs" color="brand.100">
+                              Posted on: {post.createdAt}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </VStack>
+                      
+  
+                      <Menu>
+                        <MenuButton as={IconButton} icon={<BsThreeDots />} variant="ghost" size="md" color="brand.100" />
+                        <MenuList>
+                          <MenuItem onClick={() => router.push(`/post/edit/${post.id}?community=${post.community}`)}>
+                            Edit
+                          </MenuItem>
+                          <MenuItem onClick={() => {
+                            setIsDeletingComment(false);
+                            setCurrentSubquiverId(post.subquiverId);
+                            setDeleteModal({ open: true, postId: post.id });
+                          }}>
+                            Delete
+                          </MenuItem>
+                        </MenuList>
+                      </Menu>
+                    </HStack>
+  
+                    <Box mt={2} p={4} bg="brand.800" borderRadius="md">
+                      <Text color="#F4F4F4">{post.description}</Text>
+                    </Box>
+  
+                    <HStack spacing={6} mt={2}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePostUpvote(post.id, post.subquiverId)}
+                        leftIcon={<BiSolidUpvote />}
+                      >
+                        {post.upvotes}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePostDownvote(post.id, post.subquiverId)}
+                        leftIcon={<BiSolidDownvote />}
+                      >
+                        {post.downvotes}
+                      </Button>
+                      <Button variant="outline" size="sm" leftIcon={<FaRegComment />}>
+                        {post.comments}
+                      </Button>
+                    </HStack>
+                  </Box>
+                ))
+              ) : (
+                <Text color="brand.100">No posts yet.</Text>
+              )}
+            </TabPanel>
+            <TabPanel>
+              {commentsLoading ? (
+                <Spinner size="xl" />
+              ) : comments.length > 0 ? (
+                comments.map((comment) => (
+                  <Box
+                    key={comment.id}
+                    p={4}
+                    border="2px solid"
+                    borderColor="black"
+                    borderRadius="lg"
+                    shadow="md"
+                    mt={4}
+                    maxWidth={1130}
+                  >
+                    <HStack justify="space-between" align="start">
+                    <Text fontSize={19} fontWeight={900} color="brand.100">
+                      In q/{comment.subquiverName}
+                    </Text>
+                    <Menu>
+                      <MenuButton as={IconButton} icon={<BsThreeDots />} variant="ghost" size="md" color="brand.100" />
+                      <MenuList>
+                        <MenuItem onClick={() => {
+                          router.push(`/comment/edit/${comment.id}?postId=${comment.postId}&communityId=${comment.subquiverId}`);
+                        }}>
+                          Edit
+                        </MenuItem>
+                        <MenuItem onClick={() => {
+                          setIsDeletingComment(true);
+                          setCurrentSubquiverId(comment.subquiverId);
+                          setParentPostId(comment.postId);
+                          setDeleteModal({ open: true, postId: comment.id });
+                        }}>
+                          Delete
+                        </MenuItem>
+                      </MenuList>
+                    </Menu>
+                    </HStack>
+                    <Text ml={2} fontSize="xs" fontWeight={600} color="brand.100">
+                      {comment.postTitle}
+                    </Text>
+                    <Text ml={2} fontSize="xs" color="brand.100">
+                      by u/{comment.postAuthorUsername}
+                    </Text>
+  
+                    <Box mt={2} p={4} bg="brand.800" borderRadius="md">
+                      <Text color="#F4F4F4">{comment.content}</Text>
+                    </Box>
+  
+                    <HStack spacing={6} mt={2}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handleCommentUpvote(comment.id, comment.postId, comment.subquiverId)
+                        }
+                        leftIcon={<BiSolidUpvote />}
+                      >
+                        {comment.upvotes}
+                      </Button>
+  
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handleCommentDownvote(comment.id, comment.postId, comment.subquiverId)
+                        }
+                        leftIcon={<BiSolidDownvote />}
+                      >
+                        {comment.downvotes}
+                      </Button>
+                    </HStack>
+                  </Box>
+                ))
+              ) : (
+                <Text color="brand.100">No comments yet.</Text>
+              )}
+            </TabPanel>
+            <TabPanel>
+              {loadingVotes ? (
+                <Spinner size="xl" />
+              ) : upvotedItems.length > 0 ? (
+                upvotedItems.map((item) =>
+                  item.type === "post" ? (
+                    <Box key={item.id} p={4} border="2px solid" borderColor="black" borderRadius="lg" shadow="md" mt={4} maxWidth={1130}>
+                      <Text fontWeight="bold" color="brand.100">
+                        {item.title}
+                      </Text>
+                      <Text fontSize="xs" color="brand.100">
+                        by u/{item.author}
+                      </Text>
+                      <Text color="brand.100">{item.description}</Text>
+                      <Text fontSize="xs" color="brand.100">
+                        Upvotes: {item.upvotes}, Downvotes: {item.downvotes}
+                      </Text>
+                      <Text fontSize="xs" color="brand.100">
+                        Created: {item.createdAt}
+                      </Text>
+                    </Box>
+                  ) : (
+                    <Box key={item.id} p={4} border="2px solid" borderColor="black" borderRadius="lg" shadow="md" mt={4} maxWidth={1130}>
+                      <Text fontWeight="bold" color="brand.100">
+                        Commented on Post: {item.postTitle}
+                      </Text>
+                      <Text fontSize="xs" color="brand.100">
+                        by u/{item.author}
+                      </Text>
+                      <Text color="brand.100">{item.content}</Text>
+                      <Text fontSize="xs" color="brand.100">
+                        Upvotes: {item.upvotes}, Downvotes: {item.downvotes}
+                      </Text>
+                      <Text fontSize="xs" color="brand.100">
+                        Created: {item.createdAt}
+                      </Text>
+                    </Box>
+                  )
+                )
+              ) : (
+                <Text color="brand.100">No upvoted items yet.</Text>
+              )}
+            </TabPanel>
+  
+            <TabPanel>
+              {loadingVotes ? (
+                <Spinner size="xl" />
+              ) : downvotedItems.length > 0 ? (
+                downvotedItems.map((item) =>
+                  item.type === "post" ? (
+                    <Box key={item.id} p={4} border="2px solid" borderColor="black" borderRadius="lg" shadow="md" mt={4} maxWidth={1130}>
+                      <Text fontWeight="bold" color="brand.100">
+                        {item.title}
+                      </Text>
+                      <Text fontSize="xs" color="brand.100">
+                        by u/{item.author}
+                      </Text>
+                      <Text color="brand.100">{item.description}</Text>
+                      <Text fontSize="xs" color="brand.100">
+                        Upvotes: {item.upvotes}, Downvotes: {item.downvotes}
+                      </Text>
+                      <Text fontSize="xs" color="brand.100">
+                        Created: {item.createdAt}
+                      </Text>
+                    </Box>
+                  ) : (
+                    <Box key={item.id} p={4} border="2px solid" borderColor="black" borderRadius="lg" shadow="md" mt={4} maxWidth={1130}>
+                      <Text fontWeight="bold" color="brand.100">
+                        Commented on Post: {item.postTitle}
+                      </Text>
+                      <Text fontSize="xs" color="brand.100">
+                        by u/{item.author}
+                      </Text>
+                      <Text color="brand.100">{item.content}</Text>
+                      <Text fontSize="xs" color="brand.100">
+                        Upvotes: {item.upvotes}, Downvotes: {item.downvotes}
+                      </Text>
+                      <Text fontSize="xs" color="brand.100">
+                        Created: {item.createdAt}
+                      </Text>
+                    </Box>
+                  )
+                )
+              ) : (
+                <Text color="brand.100">No downvoted items yet.</Text>
+              )}
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </Box>
+      
+      <DeletePost
+        isOpen={deleteModal.open}
+        onClose={() => {
+          setDeleteModal({ open: false, postId: null });
+          setIsDeletingComment(false);
+        }}
+        onDelete={handleDelete}
+      />
+    </>
+    );
+  };
+  
+
+export default ProfileDetailsView;

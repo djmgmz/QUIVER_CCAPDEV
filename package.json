@@ -1,0 +1,48 @@
+{
+  "name": "quiver_ccapdev_mco",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@chakra-ui/icons": "^2.2.4",
+    "@chakra-ui/react": "^2.10.4",
+    "@emotion/react": "^11.14.0",
+    "@fontsource/poppins": "^5.1.1",
+    "firebase": "^11.2.0",
+    "lucide-react": "^0.474.0",
+    "next": "^15.2.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-firebase-hooks": "^5.1.1",
+    "react-icons": "^5.4.0",
+    "react-router-dom": "^7.1.5",
+    "recoil": "^0.7.7"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.6",
+    "typescript": "^5"
+  },
+  "description": "In partial fulfillment of the course Web Application Development (CCAPDEV), a Forum Web Application called Quiver was developed. The forum web application may be designed as a general-interest forum or one that is catered towards a specific interest group. The features of this forum web application includes, but not limited to:",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/djmgmz/QUIVER_CCAPDEV.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/djmgmz/QUIVER_CCAPDEV/issues"
+  },
+  "homepage": "https://github.com/djmgmz/QUIVER_CCAPDEV#readme"
+}
