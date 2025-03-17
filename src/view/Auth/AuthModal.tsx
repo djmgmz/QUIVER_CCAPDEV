@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import { authModalState } from '@/model/atoms/authModalAtom';
 import AuthInputs from '@/model/Modal/Auth/AuthInputsModel';
-import OAuthButtons from '@/view/Auth/OAuthButtons';
+import OAuthButtons from '@/view/Modal/Auth/OAuthButtonsView';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/model/firebase/clientApp';
 

@@ -1,46 +1,14 @@
-import { authModalState } from '@/model/atoms/authModalAtom';
 import { Text, Button, Flex, Input } from '@chakra-ui/react';
-import React, { useState } from 'react';
-import { useSetRecoilState } from 'recoil';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth'
-import { auth } from '@/model/firebase/clientApp'
+import React from 'react';
 import { FIREBASE_ERRORS } from '@/model/firebase/errors';
+import { useLoginModel } from '../../../model/Modal/Auth/LoginModel';
 
 type LoginProps = {
     
 };
 
-const Login:React.FC<LoginProps> = () => {
-    const setAuthModalState = useSetRecoilState(authModalState);
-    const [loginForm, setLoginForm] = useState({
-        email: "",
-        password: "",
-    });
-
-    const [
-        signInWithEmailAndPassword,
-        user,
-        loading,
-        error,
-      ] = useSignInWithEmailAndPassword(auth);
-
-      console.log(error);
-
-    //Firebase logic
-    const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-
-        signInWithEmailAndPassword(loginForm.email, loginForm.password);
-    };
-
-    const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        //update form state
-        setLoginForm((prev) => ({
-            ...prev,
-            [event.target.name]: event.target.value,
-        }));
-    };
-
+const LoginView:React.FC<LoginProps> = () => {
+    const { loginForm, onSubmit, onChange, loading, error, setAuthModalState } = useLoginModel();
     return (
         <form onSubmit={onSubmit}>
             <Input 
@@ -122,4 +90,4 @@ const Login:React.FC<LoginProps> = () => {
     );
 
 };
-export default Login;
+export default LoginView;
