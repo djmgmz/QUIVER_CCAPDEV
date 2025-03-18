@@ -1,7 +1,7 @@
 import React from "react";
 import { Flex } from "@chakra-ui/react";
 import LoginView from "./LoginView";
-import SignUp from "../../Auth/SignUp";
+import SignUpView from "./SignUpView";
 
 type AuthInputsViewProps = {
     view: "login" | "signup" | "resetPassword";
@@ -11,7 +11,7 @@ type AuthInputsViewProps = {
     return (
       <Flex direction="column" align="center" width="100%" mt={4}>
         {view === "login" && <LoginView />}
-        {view === "signup" && <SignUp />}
+        {view === "signup" && <SignUpView />}
         {view === "resetPassword"}
       </Flex>
     );
