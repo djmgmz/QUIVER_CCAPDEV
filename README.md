@@ -1,16 +1,7 @@
 ## CCAPDEV MCO
 # Forum Web Application
 
-In partial fulfillment of the course Web Application Development (CCAPDEV), a Forum Web Application called Quiver was developed. The forum web application may be designed as a general-interest forum or one that is catered towards a specific interest group. The features of this forum web application includes, but not limited to:
-
-To access the forum web application, make sure to have Node.js  installed in your device (https://nodejs.org/). Navigate your command prompt to the folder containing the relevant files then run these commands
-
-```npm init -y```
-```npm install react@18.3.1 react-dom@18.3.1```
-```npm install next@latest```
-```npm run dev```
-
-The above commands are necessary before going to your browser and accessing localhost:3000
+Quiver is a web-based forum application developed for CCAPDEV (Web Application Development) course. The forum web application may be designed as a general-interest forum or one that is catered towards a specific interest group. The features of this forum web application includes, but not limited to:
 
 The following describes the features of a forum web application. Groups may choose to
 either design the forum web application as a general-interest forum or one that is more
@@ -105,3 +96,33 @@ as results.
 information is easy to access. Good visual design. Design suits the theme
 of the application, and is cohesive and consistent across the whole
 application
+
+
+# Installation and Setup
+To run Quiver locally, you need Node.js installed (https://nodejs.org/). 
+
+1. Clone the repository:
+```git clone https://github.com/yourusername/quiver.git```
+```cd quiver```
+
+2. Make sure there is an .env.local file to set up the environements. The content of the file:
+```NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAM_EqvHLRBjPcFsb4f8Kpq7k0afWcDp5c
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=quiverccapdevmco.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=quiverccapdevmco
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=quiverccapdevmco.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=215694210674
+NEXT_PUBLIC_FIREBASE_APP_ID=1:215694210674:web:3497e8eebbc21c1e0c34eb
+```
+
+2. Install dependencies:
+```npm init -y```
+```npm install react@18.3.1 react-dom@18.3.1```
+```npm install next@latest```
+
+
+3. Run the development server:
+```npm run dev```
+
+4. Access the application:
+Open the browser and accessing localhost:3000
+
