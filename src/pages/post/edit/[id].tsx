@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { Box, Text, useToast } from "@chakra-ui/react";
 import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { firestore } from "@/model/firebase/clientApp";
-import EditPost from "@/components/Posts/EditPost";
+import EditPost from "@/model/Posts/EditPostModel";
 import Layout from "@/view/Layout/Layout";
 
 const EditPostPage: React.FC = () => {
