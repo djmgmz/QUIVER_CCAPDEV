@@ -20,7 +20,7 @@ interface CommentDetailsProps {
 }
 
 const CommentDetailsView: React.FC<CommentDetailsProps> = ({ comment }) => {
-  const { userVote, handleVote } = useCommentDetails(comment);
+  const { userVote, setUserVote } = useCommentDetails(comment);
 
   return (
     <Box bg="white" p={4} borderRadius="md" boxShadow="sm">
@@ -38,7 +38,7 @@ const CommentDetailsView: React.FC<CommentDetailsProps> = ({ comment }) => {
           variant="ghost" 
           size="sm" 
           leftIcon={userVote === 'up' ? <BiSolidUpvote size={14} /> : <BiUpvote size={14} />}
-          onClick={() => handleVote('up')}
+          onClick={() => setUserVote('up')}
           color={userVote === 'up' ? 'brand.100' : 'gray.500'}
         >
           <Text fontSize="xs">{comment.upvotes}</Text>
@@ -48,7 +48,7 @@ const CommentDetailsView: React.FC<CommentDetailsProps> = ({ comment }) => {
           variant="ghost" 
           size="sm" 
           leftIcon={userVote === 'down' ? <BiSolidDownvote size={14} /> : <BiDownvote size={14} />} 
-          onClick={() => handleVote('down')}
+          onClick={() => setUserVote('down')}
           color={userVote === 'down' ? 'red.500' : 'gray.500'}
         >
           <Text fontSize="xs">{comment.downvotes}</Text>
