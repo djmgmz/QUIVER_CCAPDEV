@@ -4,20 +4,17 @@ import { FaBinoculars } from "react-icons/fa6";
 import { TiArrowSortedDown } from "react-icons/ti";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import DlsuStarIcon from "@/view/Icons/DlsuStarIcon";
+import DlsuStarIcon from "../Icons/DlsuStarIcon";
 import useCommunities from "@/model/hooks/useCommunities";
-import useSidebarController from "@/controller/Sidebar/SidebarController";
 
 const Sidebar = () => {
-  const {
-    showDropdown,
-    toggleDropdown,
-    handleHomeClick,
-    navigateToCommunity,
-    communities,
-    loading,
-  } = useSidebarController(); // Use the controller
+  const router = useRouter();
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { communities, loading } = useCommunities();
 
+  const handleHomeClick = () => {
+    router.push("/");
+  };
 
   return (
     <Box
@@ -65,7 +62,7 @@ const Sidebar = () => {
         spacing={1}
         align="center"
         cursor="pointer"
-        onClick={toggleDropdown}
+        onClick={() => setShowDropdown(!showDropdown)}
       >
         <Text color="brand.100" fontSize="md" fontWeight="semibold">
           Your Subquivers
@@ -89,7 +86,7 @@ const Sidebar = () => {
                 key={community.id}
                 variant="ghost"
                 justifyContent="flex-start"
-                onClick={() => navigateToCommunity(community.name)}
+                onClick={() => router.push(`/subquiver/${community.name}`)}
               >
                 <Text color="brand.600">q/{community.name}</Text>
               </Button>
