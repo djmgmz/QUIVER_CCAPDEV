@@ -1,9 +1,8 @@
 import React from "react";
-import { Box, Flex, VStack, Text, Avatar, Tabs, TabList, TabPanels, Tab, TabPanel, HStack, Button, Spinner, Divider, Menu, MenuButton, IconButton, MenuList, MenuItem } from "@chakra-ui/react";
+import { Box, Flex, VStack, Text, Avatar, Tabs, TabList, TabPanels, Tab, TabPanel, HStack, Button, Spinner, Divider, Menu, MenuButton, IconButton, MenuList, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { BsThreeDots } from "react-icons/bs";
 import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
 import { FaRegComment } from "react-icons/fa";
-import DeletePost from "@/view/Modal/DeletePost";
 import { NextRouter } from 'next/router';
 
 
@@ -389,5 +388,41 @@ interface ProfileDetailsViewProps {
     );
   };
   
+  const DeletePost = ({
+    isOpen,
+    onClose,
+    onDelete,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onDelete: () => void;
+  }) => {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Confirm Delete</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Are you sure you want to delete this item?</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              colorScheme="red"
+              onClick={() => {
+                onDelete(); // ✅ call the delete handler from props
+                onClose();  // ✅ close modal after deletion
+              }}
+            >
+              Delete
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+    );
+  };
 
 export default ProfileDetailsView;

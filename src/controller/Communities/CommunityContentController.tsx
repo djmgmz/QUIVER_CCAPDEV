@@ -1,4 +1,3 @@
-// controller/CommunityContentController.ts
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, deleteDoc, getDocs, setDoc, collection } from "firebase/firestore";
 import { firestore } from "@/model/firebase/clientApp";
 

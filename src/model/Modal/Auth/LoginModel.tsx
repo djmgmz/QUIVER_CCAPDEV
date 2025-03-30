@@ -5,7 +5,6 @@ import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth'
 import { auth } from '@/model/firebase/clientApp'
 
 
-
 export const useLoginModel = () => {
     const setAuthModalState = useSetRecoilState(authModalState);
     const [loginForm, setLoginForm] = useState({

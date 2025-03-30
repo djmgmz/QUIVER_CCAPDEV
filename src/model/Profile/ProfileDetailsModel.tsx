@@ -30,6 +30,68 @@ import { BsThreeDots } from "react-icons/bs";
 import { deletePostModalState } from "@/model/atoms/deletePostModalAtom";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { authModalState } from "@/model/atoms/authModalAtom";
+import {
+  handlePostUpvote,
+  handlePostDownvote,
+  handleCommentUpvote,
+  handleCommentDownvote,
+  handleDelete as handleDeleteFn
+} from "@/controller/Profile/ProfileDetailsController";
+
+export type CastVoteParams = {
+  type: "upvote" | "downvote";
+  target: "post" | "comment";
+  postId: string;
+  communityId: string;
+  commentId: string | null;
+  currentUser: any; // or User
+  fetchPostVotes: () => Promise<void>;
+  refreshCommentVotes: (commentId: string) => Promise<void>;
+};
+
+export const castVote = async ({
+  type,
+  target,
+  postId,
+  communityId,
+  commentId,
+  currentUser,
+  fetchPostVotes,
+  refreshCommentVotes,
+}: CastVoteParams) => {
+  try {
+    const votePath = commentId
+      ? `subquivers/${communityId}/posts/${postId}/comments/${commentId}/votes/${currentUser?.uid}`
+      : `subquivers/${communityId}/posts/${postId}/votes/${currentUser?.uid}`;
+
+    const voteRef = doc(firestore, votePath);
+    const voteDoc = await getDoc(voteRef);
+
+    if (voteDoc.exists()) {
+      const existingVote = voteDoc.data().type;
+
+      if (existingVote === type) {
+        // same vote clicked again → remove
+        await deleteDoc(voteRef);
+      } else {
+        // different vote → update it
+        await setDoc(voteRef, { type });
+      }
+    } else {
+      // no vote yet → add it
+      await setDoc(voteRef, { type });
+    }
+
+    if (target === "post") {
+      await fetchPostVotes();
+    } else if (commentId) {
+      await refreshCommentVotes(commentId);
+    }
+
+  } catch (error) {
+    console.error("Error casting vote:", error);
+  }
+};
 
 
 
@@ -42,6 +104,8 @@ interface ProfileDetailsProps {
   };
   isCurrentUser: boolean;
 }
+
+
 
 const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) => {
   const router = useRouter();
@@ -72,74 +136,6 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
   const [currentSubquiverId, setCurrentSubquiverId] = useState<string>("");
   const [parentPostId, setParentPostId] = useState<string>("");
 
-  const castVote = async (
-    type: "upvote" | "downvote",
-    target: "post" | "comment",
-    postId: string,
-    subquiverId: string,
-    commentId?: string
-  ) => {
-    try {
-      const votePath = commentId
-        ? `subquivers/${subquiverId}/posts/${postId}/comments/${commentId}/votes/${currentUser?.uid}`
-        : `subquivers/${subquiverId}/posts/${postId}/votes/${currentUser?.uid}`;
-  
-      const voteRef = doc(firestore, votePath);
-      const voteDoc = await getDoc(voteRef);
-  
-      if (voteDoc.exists()) {
-        const existingVote = voteDoc.data().type;
-        if (existingVote === type) {
-          await deleteDoc(voteRef);
-          console.log("Vote removed successfully!");
-        } else {
-          await setDoc(voteRef, { type });
-          console.log(`Vote updated to ${type}`);
-        }
-      } else {
-        await setDoc(voteRef, { type });
-        console.log(`${type} successfully recorded!`);
-      }
-  
-      // Refresh the respective vote counts
-      if (target === "post") {
-        await refreshPostVotes(postId, subquiverId);
-      } else if (target === "comment" && commentId) {
-        await refreshCommentVotes(commentId, postId, subquiverId);
-      }
-  
-      // Refresh the upvoted and downvoted panels
-      await refreshUserVotes();
-  
-    } catch (error) {
-      console.error("Error casting vote:", error);
-    }
-  };        
-
-  const handlePostUpvote = (postId: string, community: string) => {
-    castVote("upvote", "post", postId, community).then(() =>
-      refreshPostVotes(postId, community)
-    );
-  };
-  
-  const handlePostDownvote = (postId: string, community: string) => {
-    castVote("downvote", "post", postId, community).then(() =>
-      refreshPostVotes(postId, community)
-    );
-  };    
-  
-  const handleCommentUpvote = (commentId: string, postId: string, community: string) => {
-    castVote("upvote", "comment", postId, community, commentId).then(() =>
-      refreshCommentVotes(commentId, postId, community)
-    );
-  };
-  
-  const handleCommentDownvote = (commentId: string, postId: string, community: string) => {
-    castVote("downvote", "comment", postId, community, commentId).then(() =>
-      refreshCommentVotes(commentId, postId, community)
-    );
-  };    
-  
   const refreshPostVotes = async (postId: string, communityId: string) => {
     const { upvotes, downvotes } = await countVotes("post", communityId, postId);
     
@@ -478,64 +474,56 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
     }
   };
 
-  const handleDelete = async () => {
+  const onPostUpvote = (postId: string, community: string) => {
+    if (!currentUser) return;
+    handlePostUpvote(postId, community, currentUser, refreshPostVotes);
+  };
+  
+  const onPostDownvote = (postId: string, community: string) => {
+    if (!currentUser) return;
+    handlePostDownvote(postId, community, currentUser, refreshPostVotes);
+  };
+  
+  const onCommentUpvote = (commentId: string, postId: string, community: string) => {
+    if (!currentUser) return;
+    handleCommentUpvote(commentId, postId, community, currentUser, refreshCommentVotes);
+  };
+  
+  const onCommentDownvote = (commentId: string, postId: string, community: string) => {
+    if (!currentUser) return;
+    handleCommentDownvote(commentId, postId, community, currentUser, refreshCommentVotes);
+  };
+
+  const [deleteTarget, setDeleteTarget] = useState<{
+    postId: string;
+    isComment: boolean;
+    community: string;
+    parentId?: string;
+  } | null>(null);
+  
+  const handleDelete = () => {
     if (!deleteModal.postId) return;
   
-    try {
-      if (isDeletingComment) {
-        // Delete Comment and its Votes
-        const votesRef = collection(firestore, `subquivers/${currentSubquiverId}/posts/${parentPostId}/comments/${deleteModal.postId}/votes`);
-        const votesSnapshot = await getDocs(votesRef);
-        votesSnapshot.forEach((vote) => deleteDoc(vote.ref));
+    handleDeleteFn(
+      deleteModal,
+      isDeletingComment,
+      currentSubquiverId,
+      parentPostId,
+      setComments,
+      setPosts,
+      setDeleteModal,
+      setIsDeletingComment,
+      toast
+    );
+  };
   
-        await deleteDoc(doc(firestore, `subquivers/${currentSubquiverId}/posts/${parentPostId}/comments/${deleteModal.postId}`));
   
-        setComments((prev) => prev.filter((comment) => comment.id !== deleteModal.postId));
+  const onDelete = (postId: string, isComment: boolean, community: string, parentId?: string) => {
+    setDeleteTarget({ postId, isComment, community, parentId });
+    setDeleteModal({ open: true, postId }); // trigger modal
+  };
   
-        toast({
-          title: "Comment deleted successfully!",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
   
-      } else {
-        // Delete Post and its Comments and Votes
-        const commentsRef = collection(firestore, `subquivers/${currentSubquiverId}/posts/${deleteModal.postId}/comments`);
-        const commentsSnapshot = await getDocs(commentsRef);
-  
-        for (const comment of commentsSnapshot.docs) {
-          const votesRef = collection(firestore, `${comment.ref.path}/votes`);
-          const votesSnapshot = await getDocs(votesRef);
-          votesSnapshot.forEach((vote) => deleteDoc(vote.ref));
-          await deleteDoc(comment.ref);
-        }
-  
-        // Delete post votes
-        const votesRef = collection(firestore, `subquivers/${currentSubquiverId}/posts/${deleteModal.postId}/votes`);
-        const votesSnapshot = await getDocs(votesRef);
-        votesSnapshot.forEach((vote) => deleteDoc(vote.ref));
-  
-        // Delete the post itself
-        await deleteDoc(doc(firestore, `subquivers/${currentSubquiverId}/posts/${deleteModal.postId}`));
-  
-        setPosts((prev) => prev.filter((post) => post.id !== deleteModal.postId));
-  
-        toast({
-          title: "Post and its comments deleted successfully!",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    } catch (error) {
-      console.error("Error deleting:", error);
-    }
-  
-    setDeleteModal({ open: false, postId: null });
-    setIsDeletingComment(false); // Reset local state
-  };  
-
 
   return (
     <ProfileDetailsView
@@ -548,10 +536,10 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
       loading={loading}
       commentsLoading={commentsLoading}
       loadingVotes={loadingVotes}
-      handlePostUpvote={handlePostUpvote}
-      handlePostDownvote={handlePostDownvote}
-      handleCommentUpvote={handleCommentUpvote}
-      handleCommentDownvote={handleCommentDownvote}
+      handlePostUpvote={onPostUpvote}
+      handlePostDownvote={onPostDownvote}
+      handleCommentUpvote={onCommentUpvote}
+      handleCommentDownvote={onCommentDownvote}
       handleDelete={handleDelete}
       deleteModal={deleteModal}
       setDeleteModal={setDeleteModal}
@@ -563,6 +551,5 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
   
   );
 }
-
 
 export default ProfileDetails;

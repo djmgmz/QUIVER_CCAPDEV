@@ -17,6 +17,10 @@ import { FaPlus } from "react-icons/fa";
 import { auth, firestore } from "@/model/firebase/clientApp";
 import { Image } from "@chakra-ui/react";
 import EditProfileView from "@/view/Profile/EditProfileView";
+import {
+  fetchProfile,
+  handleSave,
+} from "@/controller/Profile/EditProfileController";
 
 type ProfileData = {
   username: string;
@@ -38,54 +42,14 @@ const EditProfile: React.FC = () => {
   const [usernameError, setUsernameError] = useState(false);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      if (!user) return;
-
-      try {
-        setFetchingProfile(true);
-        const userDocRef = doc(firestore, "users", user.uid);
-        const userSnapshot = await getDoc(userDocRef);
-
-        if (userSnapshot.exists()) {
-          const data = userSnapshot.data() as Partial<ProfileData>;
-          setProfileData({
-            username: data.username || "",
-            description: data.description || "",
-            profilePicture: data.profilePicture || "",
-            banner: data.banner || "",
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      } finally {
-        setFetchingProfile(false);
-      }
-    };
-
-    if (user) fetchProfile();
+    if (user) {
+      fetchProfile(user.uid, setProfileData, setFetchingProfile);
+    }
   }, [user]);
 
-  const handleSave = async () => {
-    if (!user) return;
-
-    if (!profileData.username.trim()) {
-      setUsernameError(true);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const userDocRef = doc(firestore, "users", user.uid);
-      await updateDoc(userDocRef, {
-        username: profileData.username.trim(),
-        description: profileData.description.trim(),
-      });
-
-      setUsernameError(false);
-    } catch (error) {
-      console.error("Error updating profile:", error);
-    } finally {
-      setLoading(false);
+  const onSave = () => {
+    if (user) {
+      handleSave(user.uid, profileData, setUsernameError, setLoading);
     }
   };
 
@@ -97,7 +61,7 @@ const EditProfile: React.FC = () => {
       setProfileData={setProfileData}
       usernameError={usernameError}
       setUsernameError={setUsernameError}
-      handleSave={handleSave}
+      handleSave={onSave}
       loading={loading}
     />
   );

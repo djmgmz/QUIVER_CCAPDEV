@@ -5,6 +5,11 @@ import { useState } from 'react';
 import { useToast } from '@chakra-ui/react';
 import { useTheme } from '@/view/chakra/themecontext';
 import UserMenuView from '@/view/Navbar/RightContent/UserMenuView';
+import {
+  handleViewProfile as viewProfile,
+  handleEditProfile as editProfile,
+  handleSignOut as signOutHandler,
+} from "@/controller/Navbar/RightContent/UserMenuController";
 
 type UserMenuProps = {
   user?: User | null;
@@ -16,26 +21,9 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleViewProfile = () => {
-    router.push(`/profile/${user?.uid}`);
-    setIsOpen(false);
-  };
-
-  const handleEditProfile = () => {
-    router.push(`/profile/edit`);
-    setIsOpen(false);
-  };
-
-  const handleSignOut = async () => {
-    await signOut(auth);
-    toast({
-      title: 'Signed out successfully!',
-      status: 'info',
-      duration: 3000,
-      isClosable: true,
-    });
-    setIsOpen(false);
-  };
+  const handleViewProfile = () => viewProfile(router, user?.uid, setIsOpen);
+  const handleEditProfile = () => editProfile(router, setIsOpen);
+  const handleSignOut = () => signOutHandler(toast, setIsOpen);
 
   return (
     <UserMenuView

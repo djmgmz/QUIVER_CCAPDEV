@@ -22,6 +22,11 @@ import { FaImage } from "react-icons/fa";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { auth, firestore } from "@/model/firebase/clientApp";
 import CreateSubquiverModalView from "@/view/Modal/CreateSubquiverModalView";
+import {
+  handleNext as handleNextFn,
+  handleBack as handleBackFn,
+  handleCreateSubquiver as handleCreateSubquiverFn,
+} from "../../controller/Modal/CreateSubquiverModalController";
 
 
 interface CreateSubquiverModalProps {
@@ -48,57 +53,22 @@ const CreateSubquiverModal: React.FC<CreateSubquiverModalProps> = ({
       setNameError("");
       setDescError("");
     }
-  }, [isOpen]);
+  }, [isOpen]); 
 
-  const handleNext = () => {
-    setNameError("");
-    setDescError("");
+  const handleNext = () =>
+    handleNextFn(
+      step,
+      setStep,
+      communityName,
+      description,
+      setNameError,
+      setDescError
+    );
 
-    if (step === 1) {
-      if (communityName.trim().length < 3) {
-        setNameError("Community name must be at least 3 characters.");
-        return;
-      }
-      if (description.trim().length < 5) {
-        setDescError("Description must be at least 5 characters.");
-        return;
-      }
-    }
-    setStep((prev) => prev + 1);
-  };
+  const handleBack = () => handleBackFn(setStep);
 
-  const handleBack = () => setStep((prev) => prev - 1);
-
-  const handleCreateSubquiver = async () => {
-    try {
-      await addDoc(collection(firestore, "subquivers"), {
-        name: communityName,
-        description,
-        createdAt: serverTimestamp(),
-        creatorId: auth.currentUser?.uid,
-        bannerImageURL: "",
-        iconImageURL: "",
-        memberCount: 1,
-      });
-
-      toast({
-        title: "Subquiver created!",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-
-      onClose();
-    } catch (error: any) {
-      toast({
-        title: "Error creating subquiver.",
-        description: error.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
+  const handleCreateSubquiver = async () =>
+    await handleCreateSubquiverFn(communityName, description, onClose, toast);
 
   return (
     <CreateSubquiverModalView
