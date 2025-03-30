@@ -38,6 +38,13 @@ import {
 import { useRouter } from "next/router";
 import { BiDownvote, BiSolidDownvote, BiSolidUpvote, BiUpvote } from "react-icons/bi";
 import CommunityContentView from "@/view/Communities/CommunityContentView";
+import {
+  handleJoin as join,
+  handleLeave as leave,
+  handleCreatePost as create,
+  handleConfirmDelete as confirmDelete,
+  handleVote as vote,
+} from "../../controller/Communities/CommunityContentController";
 
 interface Post {
   id: string;
@@ -133,37 +140,6 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
     }
   };
 
-  const handleJoin = async () => {
-    if (!user) {
-      setAuthModal({ open: true, view: "login" });
-      return;
-    }
-    await updateDoc(doc(firestore, "users", user.uid), {
-      joinedCommunities: arrayUnion(subquiverId),
-    });
-    setJoined(true);
-    toast({
-      title: "Joined Community!",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-  };
-
-  const handleLeave = async () => {
-    if (!user) return;
-    await updateDoc(doc(firestore, "users", user.uid), {
-      joinedCommunities: arrayRemove(subquiverId),
-    });
-    setJoined(false);
-    toast({
-      title: "Left Community!",
-      status: "info",
-      duration: 3000,
-      isClosable: true,
-    });
-  };
-
   useEffect(() => {
     if (subquiverId) {
       fetchPosts();
@@ -171,96 +147,7 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
     }
   }, [subquiverId, user]);
 
-  const handleCreatePost = () => {
-    if (!user) {
-      setAuthModal({ open: true, view: "login" });
-      return;
-    }
-    router.push(`/subquiver/${encodeURIComponent(name)}/createpost`);
-  };
 
-  const handleConfirmDelete = async () => {
-    if (!deleteModal.postId) return;
-    try {
-      const postId = deleteModal.postId;
-  
-      const commentsRef = collection(firestore, "subquivers", subquiverId, "posts", postId, "comments");
-      const commentsSnapshot = await getDocs(commentsRef);
-  
-      for (const commentDoc of commentsSnapshot.docs) {
-        const commentId = commentDoc.id;
-  
-        const votesRef = collection(firestore, "subquivers", subquiverId, "posts", postId, "comments", commentId, "votes");
-        const votesSnapshot = await getDocs(votesRef);
-        for (const voteDoc of votesSnapshot.docs) {
-          await deleteDoc(doc(votesRef, voteDoc.id));
-        }
-  
-        await deleteDoc(doc(commentsRef, commentId));
-      }
-  
-      const postVotesRef = collection(firestore, "subquivers", subquiverId, "posts", postId, "votes");
-      const postVotesSnapshot = await getDocs(postVotesRef);
-      for (const voteDoc of postVotesSnapshot.docs) {
-        await deleteDoc(doc(postVotesRef, voteDoc.id));
-      }
-  
-      await deleteDoc(doc(firestore, "subquivers", subquiverId, "posts", postId));
-  
-      toast({
-        title: "Post and its comments deleted successfully!",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-  
-      fetchPosts();
-    } catch (error) {
-      console.error("Error deleting post and comments:", error);
-      toast({
-        title: "Failed to delete the post and its comments.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    } finally {
-      setDeleteModal({ open: false, postId: null });
-    }
-  };
-  
-
-  const handleVote = async (postId: string, type: "upvote" | "downvote") => {
-    if (!user) {
-      setAuthModal({ open: true, view: "login" });
-      return;
-    }
-  
-    const voteRef = doc(firestore, `subquivers/${subquiverId}/posts/${postId}/votes/${user.uid}`);
-    const voteDoc = await getDoc(voteRef);
-  
-    try {
-      if (voteDoc.exists()) {
-        const currentVote = voteDoc.data().type;
-        if (currentVote === type) {
-          await deleteDoc(voteRef);
-          updateVoteCounts(postId, type, -1);
-          updateUserVote(postId, null);
-        } else {
-          await setDoc(voteRef, { type });
-          updateVoteCounts(postId, type, 1);
-          updateVoteCounts(postId, currentVote, -1);
-          updateUserVote(postId, type);
-        }
-      } else {
-        await setDoc(voteRef, { type });
-        updateVoteCounts(postId, type, 1);
-        updateUserVote(postId, type);
-      }
-    } catch (error) {
-      console.error("Error handling vote:", error);
-    }
-  };
-  
   const updateVoteCounts = (postId: string, type: "upvote" | "downvote", delta: number) => {
     setPosts((prevPosts) =>
       prevPosts.map((p) =>
@@ -277,18 +164,143 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
     );
   };
 
+  const handleJoin = (
+    user: any,
+    subquiverId: string,
+    setJoined: (val: boolean) => void,
+    toast: ReturnType<typeof useToast>,
+    setAuthModal: ReturnType<typeof useSetRecoilState>
+  ) => {
+    join(user, subquiverId);
+    setJoined(true);
+    toast({ title: "Joined Community!", status: "success", duration: 3000, isClosable: true });
+  };
+  
+  const handleLeave = (
+    user: any,
+    subquiverId: string,
+    setJoined: (val: boolean) => void,
+    toast: ReturnType<typeof useToast>
+  ) => {
+    leave(user, subquiverId);
+    setJoined(false);
+    toast({ title: "Left Community!", status: "info", duration: 3000, isClosable: true });
+  };
+  
+  const handleCreatePost = (
+    user: any,
+    name: string,
+    router: ReturnType<typeof useRouter>,
+    setAuthModal: ReturnType<typeof useSetRecoilState>
+  ) => {
+    create(user, name, router);
+  };
+  
+  const handleConfirmDelete = (
+    subquiverId: string,
+    postId: string,
+    toast: ReturnType<typeof useToast>,
+    fetchPosts: () => void,
+    setDeleteModal: ReturnType<typeof useRecoilState>[1]
+  ) => {
+    confirmDelete(subquiverId, postId);
+    toast({ title: "Post and its comments deleted successfully!", status: "success", duration: 3000, isClosable: true });
+    fetchPosts();
+    setDeleteModal({ open: false, postId: null });
+  };
+  
+  const handleVote = async (
+    user: any,
+    subquiverId: string,
+    postId: string,
+    type: "upvote" | "downvote",
+    setAuthModal: ReturnType<typeof useSetRecoilState>,
+    updateVoteCounts: (id: string, type: "upvote" | "downvote", delta: number) => void,
+    updateUserVote: (id: string, vote: "upvote" | "downvote" | null) => void
+  ) => {
+    const result = await vote(user, subquiverId, postId, type);
+    if (result === "added") {
+      updateVoteCounts(postId, type, 1);
+      updateUserVote(postId, type);
+    } else if (result === "removed") {
+      updateVoteCounts(postId, type, -1);
+      updateUserVote(postId, null);
+    } else if (result === "switched") {
+      updateVoteCounts(postId, type, 1);
+      updateVoteCounts(postId, type === "upvote" ? "downvote" : "upvote", -1);
+      updateUserVote(postId, type);
+    }
+  };
+
+  const onConfirmDelete = () => {
+    if (!deleteModal.postId) return;
+    confirmDelete(subquiverId, deleteModal.postId);
+    toast({
+      title: "Post and its comments deleted successfully!",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+    fetchPosts();
+    setDeleteModal({ open: false, postId: null });
+  };
+  
+  const onJoin = () => {
+    join(user, subquiverId);
+    setJoined(true);
+    toast({
+      title: "Joined Community!",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+  
+  const onLeave = () => {
+    leave(user, subquiverId);
+    setJoined(false);
+    toast({
+      title: "Left Community!",
+      status: "info",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+
+  const onCreatePost = () => {
+    create(user, name, router);
+  };
+  
+  const onVote = async (postId: string, type: "upvote" | "downvote") => {
+    const result = await vote(user, subquiverId, postId, type);
+  
+    if (result === "added") {
+      updateVoteCounts(postId, type, 1);
+      updateUserVote(postId, type);
+    } else if (result === "removed") {
+      updateVoteCounts(postId, type, -1);
+      updateUserVote(postId, null);
+    } else if (result === "switched") {
+      updateVoteCounts(postId, type, 1);
+      updateVoteCounts(postId, type === "upvote" ? "downvote" : "upvote", -1);
+      updateUserVote(postId, type);
+    }
+  };
+  
+  
+
   return (
     <CommunityContentView
       name={name}
       posts={posts}
       loading={loading}
       joined={joined}
-      handleJoin={handleJoin}
-      handleLeave={handleLeave}
-      handleCreatePost={handleCreatePost}
-      handleVote={handleVote}
+      handleJoin={onJoin}
+      handleLeave={onLeave}
+      handleCreatePost={onCreatePost}
+      handleVote={onVote}
       deleteModal={deleteModal}
-      handleConfirmDelete={handleConfirmDelete}
+      handleConfirmDelete={onConfirmDelete}
       setDeleteModal={setDeleteModal}
       fetchPosts={fetchPosts}
       checkMembership={checkMembership}
@@ -306,32 +318,5 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
     user: { uid: string | null } | null;
   }
   
-/* removed unreachable code
-const PostCard: React.FC<PostCardProps> = ({ post, handleVote }) => {
-  const setAuthModal = useSetRecoilState(authModalState);
-  const setDeleteModal = useSetRecoilState(deletePostModalState);
-  const user = auth.currentUser;
-  const router = useRouter();
-
-  const handleEditPost = () => {
-    router.push(`/post/edit/${post.id}?community=${post.community}`);
-  };
-  
-  const handleViewPost = () => {
-    router.push(`/post/${post.id}`);
-  };
-
-  return (
-    <PostCard
-      post={post}
-      handleVote={handleVote}
-      setDeleteModal={setDeleteModal}
-      user={user}
-    />
-  );
-  
-  } 
-*/
-
 }
 export default CommunityContent;
