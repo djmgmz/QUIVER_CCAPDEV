@@ -101,11 +101,10 @@ interface ProfileDetailsProps {
     username: string;
     description: string;
     profilePicture: string | null;
+    banner: string | null;
   };
   isCurrentUser: boolean;
 }
-
-
 
 const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) => {
   const router = useRouter();
@@ -527,7 +526,10 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
 
   return (
     <ProfileDetailsView
-      user={user}
+      user={{
+        ...user,
+        banner: user.banner ?? null,
+      }}
       isCurrentUser={isCurrentUser}
       posts={posts}
       comments={comments}
