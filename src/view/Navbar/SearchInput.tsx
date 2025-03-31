@@ -135,7 +135,8 @@ import {
           overflowY="auto"
         >
           <List spacing={1}>
-            {subquivers
+          {!communityFilter &&
+            subquivers
               .filter((sq) =>
                 sq.toLowerCase().includes(searchTerm.toLowerCase())
               )
@@ -160,7 +161,7 @@ import {
                   </Text>
                 </ListItem>
               ))}
-        
+
             {filteredPosts.map((post) => (
               <ListItem
                 key={post.id}

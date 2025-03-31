@@ -45,8 +45,6 @@ interface Post {
     setFilteredPosts(filtered);
   };
   
-  
-  
   export const handleRemoveTag = (
     communityFilter: string | null,
     searchTerm: string,
