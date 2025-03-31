@@ -57,6 +57,7 @@ interface Post {
   downvotes: number;
   userVote?: "upvote" | "downvote" | null;
   createdAt?: string;
+  profilePicture?: string | null;
 }
 
 interface CommunityContentProps {
@@ -87,12 +88,18 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
         querySnapshot.docs.map(async (docItem) => {
           const postData = docItem.data();
           let username = "anonymous";
+          let profilePicture: string | null = null;
   
-          // Fetch Username
+          // Fetch Username and Profile Picture
           if (postData.author) {
             const userDoc = await getDoc(doc(firestore, "users", postData.author));
-            username = userDoc.exists() ? userDoc.data()?.username || "anonymous" : "anonymous";
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              username = userData?.username || "anonymous";
+              profilePicture = userData?.profilePicture || null;
+            }
           }
+
   
           // Count Upvotes and Downvotes
           const votesSnapshot = await getDocs(
@@ -120,6 +127,7 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
             upvotes,
             downvotes,
             userVote,
+            profilePicture,
           };
         })
       );

@@ -24,7 +24,7 @@ import { BiSolidUpvote } from "react-icons/bi";
 import { BiSolidDownvote } from "react-icons/bi";
 import { BiUpvote } from "react-icons/bi";
 import { BiDownvote } from "react-icons/bi";
-import { auth } from "@/model/firebase/clientApp"; // Adjust path if necessary
+import { auth } from "@/model/firebase/clientApp";
 
 const user = auth.currentUser;
 
@@ -40,6 +40,7 @@ interface Post {
   downvotes: number;
   userVote?: "upvote" | "downvote" | null;
   createdAt?: string;
+  profilePicture?: string | null;
 }
 
 interface PostCardProps {
@@ -71,7 +72,15 @@ const PostCard: React.FC<PostCardProps> = ({ post, handleVote, setDeleteModal, u
       >
         <HStack justify="space-between">
           <HStack>
-            <Avatar size="sm" bg="brand.100" />
+          <Avatar
+              size="sm"
+              bg="gray.400"
+              src={post.profilePicture || "/images/guestprofilepic.jpeg"}
+              sx={{
+                border: "1px solid",
+                borderColor: "brand.100",
+              }}
+            />
             <VStack spacing={0} align="start">
               <Text fontWeight="bold" color="brand.100">{post.title}</Text>
               <Text fontSize="xs" color="brand.100">u/{post.username}</Text>
