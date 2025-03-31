@@ -74,6 +74,7 @@ const EditPostPage: React.FC = () => {
       await updateDoc(postRef, {
         title,
         description,
+        edited: true,
       });
 
       toast({

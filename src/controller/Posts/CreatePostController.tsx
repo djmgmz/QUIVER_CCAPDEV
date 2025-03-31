@@ -1,4 +1,3 @@
-// controller/Posts/CreatePostController.ts
 import { addDoc, collection, serverTimestamp, getDocs, query, where } from "firebase/firestore";
 import { firestore } from "@/model/firebase/clientApp";
 import { NextRouter } from "next/router";
@@ -52,6 +51,7 @@ export const handleCreatePost = async (
     createdAt: serverTimestamp(),
     upvotes: 0,
     downvotes: 0,
+    edited: false,
   });
 
   toast({
