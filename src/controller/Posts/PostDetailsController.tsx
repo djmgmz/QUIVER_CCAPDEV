@@ -103,6 +103,7 @@ import {
       author: currentUser?.uid || "unknown",
       username: currentUser?.displayName || "Anonymous",
       createdAt: serverTimestamp(),
+      edited: false,
     };
   
     const docRef = await addDoc(commentsRef, newComment);

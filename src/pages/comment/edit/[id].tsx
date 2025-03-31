@@ -92,7 +92,11 @@ const EditCommentPage = () => {
         `subquivers/${communityId}/posts/${postId}/comments/${id}`
       );
 
-      await setDoc(commentRef, { ...comment, content: editedContent }, { merge: true });
+      await setDoc(commentRef, {
+        ...comment,
+        content: editedContent,
+        edited: true,
+      }, { merge: true });
 
       console.log(`💾 Comment saved: ${id}`);
       router.push(`/post/${postId}?community=${communityId}`);

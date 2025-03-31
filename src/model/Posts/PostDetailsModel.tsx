@@ -53,6 +53,7 @@ interface Comment {
   userVote?: "upvote" | "downvote" | null;
   upvotes?: number;
   downvotes?: number;
+  edited?: boolean;
 }
 
 
@@ -178,6 +179,7 @@ const fetchComments = async () => {
           userVote,
           upvotes,
           downvotes,
+          edited: data.edited ?? false,
         };
       })
     );

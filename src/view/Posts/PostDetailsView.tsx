@@ -31,6 +31,7 @@ interface Post {
   createdAt?: any;
   upvotes?: number;
   downvotes?: number;
+  edited?: boolean;
 }
 
 interface Comment {
@@ -42,6 +43,7 @@ interface Comment {
   userVote?: "upvote" | "downvote" | null;
   upvotes?: number;
   downvotes?: number;
+  edited?: boolean;
 }
 
 interface PostDetailsViewProps {
@@ -131,6 +133,7 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
         <HStack spacing={2} color="brand.600" fontSize="sm" ml={69}>
           <Text fontSize="17">u/{authorUsername}</Text>
           <Text>{formattedDate}</Text>
+          <Text>{post.edited ? " (edited)" : ""}</Text>
         </HStack>
       </Box>
 
@@ -239,6 +242,7 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
                 <HStack spacing={2} color="brand.100" fontSize="sm">
                   <Text fontWeight="bold">u/{comment.username}</Text>
                   <Text>{formattedDate}</Text>
+                  <Text>{comment.edited ? " (edited)" : ""}</Text>
                 </HStack>
 
                 <Text color="brand.100" mt={2}>
