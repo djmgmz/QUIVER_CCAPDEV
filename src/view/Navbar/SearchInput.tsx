@@ -33,6 +33,7 @@ import {
       showDropdown,
       setShowDropdown,
       containerRef,
+      subquivers,
     } = useSearchInputModel();
   
     return (
@@ -120,47 +121,73 @@ import {
           </Flex>
         </InputGroup>
   
-        {showDropdown && filteredPosts.length > 0 && (
+        {showDropdown && (filteredPosts.length > 0 || searchTerm.trim() !== "") && (
           <Box
-            position="absolute"
-            top="44px"
-            width="100%"
-            bg="brand.200"
-            border="1px solid"
-            borderColor="gray.200"
-            zIndex={10}
-            borderRadius="md"
-            maxHeight="300px"
-            overflowY="auto"
-          >
-            <List spacing={1}>
-              {filteredPosts.map((post) => (
+          position="absolute"
+          top="44px"
+          width="100%"
+          bg="brand.200"
+          border="1px solid"
+          borderColor="gray.200"
+          zIndex={10}
+          borderRadius="md"
+          maxHeight="300px"
+          overflowY="auto"
+        >
+          <List spacing={1}>
+            {subquivers
+              .filter((sq) =>
+                sq.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .map((sq) => (
                 <ListItem
-                  key={post.id}
+                  key={`subquiver-${sq}`}
                   px={3}
                   py={2}
                   role="group"
                   _hover={{ bg: "brand.100", cursor: "pointer" }}
-                  onClick={() => router.push(`/post/${post.id}`)}
+                  onClick={() => router.push(`/subquiver/${encodeURIComponent(sq)}`)}
                 >
                   <Text
-                    color="brand.100"
                     fontWeight="bold"
-                    _groupHover={{ color: "brand.200" }}
-                  >
-                    {post.title}
-                  </Text>
-                  <Text
-                    fontSize="sm"
                     color="brand.100"
                     _groupHover={{ color: "brand.200" }}
                   >
-                    q/{post.community}
+                    q/{sq}
+                  </Text>
+                  <Text fontSize="sm" color="brand.100" _groupHover={{ color: "brand.200" }}>
+                    Community
                   </Text>
                 </ListItem>
               ))}
-            </List>
-          </Box>
+        
+            {filteredPosts.map((post) => (
+              <ListItem
+                key={post.id}
+                px={3}
+                py={2}
+                role="group"
+                _hover={{ bg: "brand.100", cursor: "pointer" }}
+                onClick={() => router.push(`/post/${post.id}`)}
+              >
+                <Text
+                  color="brand.100"
+                  fontWeight="bold"
+                  _groupHover={{ color: "brand.200" }}
+                >
+                  {post.title}
+                </Text>
+                <Text
+                  fontSize="sm"
+                  color="brand.100"
+                  _groupHover={{ color: "brand.200" }}
+                >
+                  q/{post.community}
+                </Text>
+              </ListItem>
+            ))}
+          </List>
+        </Box>        
         )}
       </Flex>
     );

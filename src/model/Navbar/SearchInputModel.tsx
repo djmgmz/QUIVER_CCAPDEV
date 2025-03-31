@@ -15,17 +15,25 @@ export const useSearchInputModel = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [subquivers, setSubquivers] = useState<string[]>([]);
+
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
       const subquiversSnapshot = await getDocs(collection(firestore, "subquivers"));
       let allPosts: Post[] = [];
+      const subquiverNameSet = new Set<string>();
 
       for (const docSnap of subquiversSnapshot.docs) {
         const communityId = docSnap.id;
         const communityName = docSnap.data().name;
-        const postsSnapshot = await getDocs(collection(firestore, "subquivers", communityId, "posts"));
+
+        subquiverNameSet.add(communityName);
+
+        const postsSnapshot = await getDocs(
+          collection(firestore, "subquivers", communityId, "posts")
+        );
 
         postsSnapshot.forEach((postDoc) => {
           allPosts.push({
@@ -36,6 +44,7 @@ export const useSearchInputModel = () => {
         });
       }
 
+      setSubquivers(Array.from(subquiverNameSet));
       setPosts(allPosts);
     };
 
@@ -72,5 +81,6 @@ export const useSearchInputModel = () => {
     showDropdown,
     setShowDropdown,
     containerRef,
+    subquivers,
   };
 };
