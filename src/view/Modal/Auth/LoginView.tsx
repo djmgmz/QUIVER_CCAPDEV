@@ -2,6 +2,8 @@ import { Text, Button, Flex, Input } from '@chakra-ui/react';
 import React from 'react';
 import { FIREBASE_ERRORS } from '@/model/firebase/errors';
 import { useLoginModel } from '../../../model/Modal/Auth/LoginModel';
+import { Checkbox } from '@chakra-ui/react';
+
 
 type LoginProps = {
     
@@ -58,6 +60,28 @@ const LoginView:React.FC<LoginProps> = () => {
             <Text textAlign="center" color="red" fontSize="10pt"> 
                 {FIREBASE_ERRORS[error?.message as keyof typeof FIREBASE_ERRORS]}
             </Text>
+            <Flex align="center" justify="center" mr={2}>
+                <Checkbox
+                    name="rememberMe"
+                    onChange={onChange}
+                    isChecked={loginForm.rememberMe}
+                    iconColor="white"
+                    borderColor="brand.100"
+                    color="brand.100"
+                    sx={{
+                        ".chakra-checkbox__control": {
+                        borderColor: "brand.100",
+                        _checked: {
+                            bg: "brand.100",
+                            borderColor: "brand.100",
+                        },
+                        },
+                    }}
+                    size="sm"
+                    >
+                    Remember me
+                </Checkbox>
+            </Flex>
             <Button 
             width="100%"
             height="36px"

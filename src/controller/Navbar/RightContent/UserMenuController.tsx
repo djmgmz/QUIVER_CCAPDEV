@@ -27,11 +27,16 @@ export const handleSignOut = async (
   setIsOpen: (open: boolean) => void
 ) => {
   await signOut(auth);
+
+  document.cookie = "rememberMe=; max-age=0; path=/";
+  document.cookie = "rememberMeExpiresAt=; max-age=0; path=/";
+
   toast({
-    title: 'Signed out successfully!',
-    status: 'info',
+    title: "Signed out successfully!",
+    status: "info",
     duration: 3000,
     isClosable: true,
   });
+
   setIsOpen(false);
 };

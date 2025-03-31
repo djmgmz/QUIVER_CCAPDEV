@@ -6,6 +6,8 @@ import Layout from "@/view/Layout/Layout";
 import { useRouter } from "next/router";
 import { theme as baseTheme } from "../view/chakra/theme";
 import { ThemeProvider, useTheme } from "@/view/chakra/themecontext";
+import RememberMeRefresher from "@/model/Cookies/RememberMeRefresher";
+
 
 const DynamicThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const { theme } = useTheme();
@@ -27,15 +29,16 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <RecoilRoot>
       <ThemeProvider>
-        <DynamicThemeProvider>
-          {!isPostPage ? (
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          ) : (
+      <DynamicThemeProvider>
+        <RememberMeRefresher />
+        {!isPostPage ? (
+          <Layout>
             <Component {...pageProps} />
-          )}
-        </DynamicThemeProvider>
+          </Layout>
+        ) : (
+          <Component {...pageProps} />
+        )}
+      </DynamicThemeProvider>
       </ThemeProvider>
     </RecoilRoot>
   );
