@@ -159,7 +159,15 @@ interface ProfileDetailsViewProps {
                               {post.title}
                         </Text>
                         <HStack >
-                          <Avatar size="sm" bg="brand.100" />
+                        <Avatar
+                            size="sm"
+                            bg="gray.400"
+                            src={user.profilePicture || "/images/guestprofilepic.jpeg"}
+                            sx={{
+                              border: "1px solid",
+                              borderColor: "brand.100",
+                            }}
+                          />
   
                           <VStack spacing={0} align="start">
                             <Text fontSize="xs" color="brand.100">

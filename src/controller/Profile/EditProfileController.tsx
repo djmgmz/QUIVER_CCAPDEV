@@ -2,6 +2,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadString, getDownloadURL } from "firebase/storage";
 import { storage, firestore } from "@/model/firebase/clientApp";
 import { uploadImageToStorage } from "../UploadImage/uploadImageToStorage";
+import { NextRouter } from "next/router";
 
 export const fetchProfile = async (
   userId: string,
@@ -43,7 +44,8 @@ export const handleSave = async (
     banner: string;
   },
   setUsernameError: React.Dispatch<React.SetStateAction<boolean>>,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  router: NextRouter
 ) => {
   try {
     setLoading(true);
@@ -83,6 +85,7 @@ export const handleSave = async (
     }
 
     await updateDoc(userDocRef, updatePayload);
+    await router.push(`/profile/${userId}`);
     setUsernameError(false);
   } catch (error) {
     console.error("Error updating profile:", error);

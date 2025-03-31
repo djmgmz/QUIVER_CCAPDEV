@@ -21,6 +21,7 @@ import {
   fetchProfile,
   handleSave,
 } from "@/controller/Profile/EditProfileController";
+import router from "next/router";
 
 type ProfileData = {
   username: string;
@@ -49,7 +50,7 @@ const EditProfile: React.FC = () => {
 
   const onSave = () => {
     if (user) {
-      handleSave(user.uid, profileData, setUsernameError, setLoading);
+      handleSave(user.uid, profileData, setUsernameError, setLoading, router);
     }
   };
 
