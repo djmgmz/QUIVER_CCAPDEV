@@ -1,7 +1,6 @@
 import { signOut, User } from 'firebase/auth';
-import { auth } from '@/model/firebase/clientApp';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useToast } from '@chakra-ui/react';
 import { useTheme } from '@/view/chakra/themecontext';
 import UserMenuView from '@/view/Navbar/RightContent/UserMenuView';
@@ -10,6 +9,8 @@ import {
   handleEditProfile as editProfile,
   handleSignOut as signOutHandler,
 } from "@/controller/Navbar/RightContent/UserMenuController";
+import { doc, getDoc } from 'firebase/firestore';
+import { firestore } from '@/model/firebase/clientApp';
 
 type UserMenuProps = {
   user?: User | null;
@@ -20,14 +21,30 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
   const { toggleTheme } = useTheme();
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      if (user?.uid) {
+        const userDoc = await getDoc(doc(firestore, "users", user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setProfilePicture(data.profilePicture || null);
+        }
+      }
+    };
+
+    fetchProfilePicture();
+  }, [user?.uid]);
 
   const handleViewProfile = () => viewProfile(router, user?.uid, setIsOpen);
   const handleEditProfile = () => editProfile(router, setIsOpen);
-  const handleSignOut = () => signOutHandler(toast, setIsOpen);
+  const handleSignOut = () => signOutHandler(toast, setIsOpen, setProfilePicture);
 
   return (
     <UserMenuView
       user={user}
+      profilePicture={profilePicture}
       isOpen={isOpen}
       setIsOpen={setIsOpen}
       handleViewProfile={handleViewProfile}

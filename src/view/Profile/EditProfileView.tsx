@@ -192,7 +192,44 @@ const EditProfileView: React.FC<EditProfileProps> = ({
                     objectFit="cover"
                   />
                 )}
+
+                <Flex
+                  position="absolute"
+                  direction="column"
+                  justify="center"
+                  align="center"
+                  width="full"
+                  height="full"
+                  bg="rgba(0, 0, 0, 0.3)"
+                  borderRadius="md"
+                  _hover={{ bg: "rgba(0, 0, 0, 0.4)" }}
+                >
+                  <Icon as={FaPlus} boxSize={6} color="white" />
+                  <Text fontSize="sm" color="white" align="center">
+                    Add a banner image
+                  </Text>
+                </Flex>
               </Box>
+
+              <Input
+                type="file"
+                accept="image/*"
+                id="bannerInput"
+                display="none"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      setProfileData({
+                        ...profileData,
+                        banner: reader.result as string,
+                      });
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+              />
             </Box>
 
             {usernameError && (

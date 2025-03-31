@@ -24,12 +24,15 @@ export const handleEditProfile = (
 
 export const handleSignOut = async (
   toast: (options: UseToastOptions) => void,
-  setIsOpen: (open: boolean) => void
+  setIsOpen: (open: boolean) => void,
+  setProfilePicture: React.Dispatch<React.SetStateAction<string | null>>
 ) => {
   await signOut(auth);
 
   document.cookie = "rememberMe=; max-age=0; path=/";
   document.cookie = "rememberMeExpiresAt=; max-age=0; path=/";
+
+  setProfilePicture(null);
 
   toast({
     title: "Signed out successfully!",
@@ -40,3 +43,4 @@ export const handleSignOut = async (
 
   setIsOpen(false);
 };
+

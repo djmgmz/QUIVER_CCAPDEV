@@ -11,6 +11,7 @@ interface UserProfile {
   email: string;
   description: string;
   profilePicture: string | null;
+  banner: string | null;
 }
 
 const ProfilePage = () => {
@@ -30,9 +31,14 @@ const ProfilePage = () => {
         const userSnap = await getDoc(userRef);
   
         if (userSnap.exists()) {
+          const data = userSnap.data();
           setUserData({
-            ...(userSnap.data() as Omit<UserProfile, "uid">),
             uid: userSnap.id,
+            username: data.username || "",
+            email: data.email || "",
+            description: data.description || "",
+            profilePicture: data.profilePicture || null,
+            banner: data.banner || null,
           });
         } else {
           console.error("User not found");

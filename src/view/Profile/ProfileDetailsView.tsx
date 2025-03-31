@@ -12,6 +12,7 @@ interface ProfileDetailsViewProps {
     username: string;
     description: string;
     profilePicture: string | null;
+    banner: string | null;
   };
   isCurrentUser: boolean;
   posts: Array<{
@@ -81,17 +82,30 @@ interface ProfileDetailsViewProps {
     return (
       <>
       <Box width="full" position="relative">
-        <Box width="full" height="150px" bg="brand.100" position="relative">
-          <Avatar
-            size="xl"
-            position="absolute"
-            bottom="-40px"
-            left="20px"
-            border="4px solid"
-            borderColor="white"
-            bg="brand.100"
-            src={user.profilePicture || "/images/guestprofilepic.jpeg"}
-          />
+      <Box
+          width="full"
+          height="150px"
+          position="relative"
+          sx={{
+            bg: user.banner ? "transparent" : "brand.100",
+            backgroundImage: user.banner ? `url(${user.banner})` : undefined,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
+          }}          
+        >
+        <Avatar
+          size="xl"
+          position="absolute"
+          bottom="-40px"
+          left="20px"
+          bg="gray.400"
+          src={user.profilePicture || "/images/guestprofilepic.jpeg"}
+          sx={{
+            border: "4px solid",
+            borderColor: "brand.100",
+          }}
+        />
         </Box>
   
         <Flex align="center" justify="space-between" mt={1} ml={90} px={10}>

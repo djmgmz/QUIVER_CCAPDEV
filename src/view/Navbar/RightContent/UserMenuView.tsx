@@ -8,21 +8,24 @@ import {
     Icon,
     Flex,
   } from '@chakra-ui/react';
+  import { FiUser } from 'react-icons/fi';
   import { TiArrowSortedDown } from 'react-icons/ti';
   import { User } from 'firebase/auth';
   
   type UserMenuViewProps = {
     user?: User | null;
+    profilePicture: string | null;
     isOpen: boolean;
     setIsOpen: (value: boolean) => void;
     handleViewProfile: () => void;
     handleEditProfile: () => void;
     handleSignOut: () => void;
     toggleTheme: () => void;
-  };
+  };  
   
   const UserMenuView: React.FC<UserMenuViewProps> = ({
     user,
+    profilePicture,
     isOpen,
     setIsOpen,
     handleViewProfile,
@@ -41,10 +44,15 @@ import {
           onClick={() => setIsOpen(!isOpen)}
         >
           <Flex align="center">
-            <Avatar
-              size="sm"
-              src={user ? user.photoURL || '/images/guestprofilepic.jpeg' : '/images/guestprofilepic.jpeg'}
-            />
+          <Avatar
+            size="sm"
+            src={profilePicture ?? user?.photoURL ?? undefined}
+            bg="gray.400"
+            sx={{
+              border: "2px solid",
+              borderColor: "brand.100",
+            }}
+          />
             <Icon
               as={TiArrowSortedDown}
               boxSize={5}

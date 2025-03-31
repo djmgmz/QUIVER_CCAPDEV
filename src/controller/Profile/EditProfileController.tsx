@@ -1,5 +1,7 @@
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { firestore } from "@/model/firebase/clientApp";
+import { ref, uploadString, getDownloadURL } from "firebase/storage";
+import { storage, firestore } from "@/model/firebase/clientApp";
+import { uploadImageToStorage } from "../UploadImage/uploadImageToStorage";
 
 export const fetchProfile = async (
   userId: string,
@@ -52,11 +54,35 @@ export const handleSave = async (
     }
 
     const userDocRef = doc(firestore, "users", userId);
-    await updateDoc(userDocRef, {
+    const updatePayload: any = {
       username: profileData.username.trim(),
       description: profileData.description.trim(),
-    });
+    };
 
+    if (
+      profileData.profilePicture &&
+      profileData.profilePicture.startsWith("data:")
+    ) {
+      const blob = await fetch(profileData.profilePicture).then((res) =>
+        res.blob()
+      );
+      const file = new File([blob], `${userId}_profile.jpg`, {
+        type: blob.type,
+      });
+      const url = await uploadImageToStorage(file, `users/${userId}/profile.jpg`);
+      updatePayload.profilePicture = url;
+    }
+
+    if (profileData.banner && profileData.banner.startsWith("data:")) {
+      const blob = await fetch(profileData.banner).then((res) => res.blob());
+      const file = new File([blob], `${userId}_banner.jpg`, {
+        type: blob.type,
+      });
+      const url = await uploadImageToStorage(file, `users/${userId}/banner.jpg`);
+      updatePayload.banner = url;
+    }
+
+    await updateDoc(userDocRef, updatePayload);
     setUsernameError(false);
   } catch (error) {
     console.error("Error updating profile:", error);
