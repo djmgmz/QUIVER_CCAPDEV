@@ -160,7 +160,7 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
                 width: "16px",
                 height: "100%",
                 borderLeft: "2px solid",
-                borderColor: transparentize("brand.100", 0.5), // 0.8 = 80% transparent
+                borderColor: transparentize("brand.100", 0.5),
               }
             : {}
         }
@@ -173,7 +173,7 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
                 left: "-4px",
                 width: "16px", // horizontal part of L
                 borderTop: "2px solid",
-                borderColor: transparentize("brand.100", 0.5), // 0.8 = 80% transparent
+                borderColor: transparentize("brand.100", 0.5),
               }
             : {}
         }
@@ -223,14 +223,16 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
             <Text fontSize="xs">{comment.downvotes}</Text>
           </Button>
 
-          <Button
-            size="xs"
-            variant="outline"
-            onClick={() => setIsReplying(!isReplying)}
-            color="brand.100"
-          >
-            {isReplying ? "Cancel" : "Reply"}
-          </Button>
+          {!isReplying && (
+            <Button
+              size="xs"
+              variant="outline"
+              onClick={() => setIsReplying(true)}
+              color="brand.100"
+            >
+              Reply
+            </Button>
+          )}
 
         </HStack>
 
@@ -249,15 +251,17 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
                   value={replyText}
                   onChange={(e) => setReplyText(e.target.value)}
                   color="brand.100"
+                  borderRadius="md"
+                  borderColor="brand.100"
                 />
               </InputGroup>
               <HStack mt={1} spacing={2}>
                 <Button size="xs" type="submit" colorScheme="blue">
-                  Reply
+                  Submit
                 </Button>
                 <Button
                   size="xs"
-                  variant="ghost"
+                  variant="outline"
                   onClick={() => {
                     setReplyText("");
                     setIsReplying(false);
