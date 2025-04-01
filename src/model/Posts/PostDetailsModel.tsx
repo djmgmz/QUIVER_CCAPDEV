@@ -31,6 +31,7 @@ import {
   handleDeleteComment,
   handleCommentSubmit,
   handleVote,
+  handleReplySubmit,
 } from "@/controller/Posts/PostDetailsController";
 
 interface Post {
@@ -50,12 +51,13 @@ interface Comment {
   username: string;
   content: string;
   createdAt: any;
+  parentId?: string | null;
   userVote?: "upvote" | "downvote" | null;
   upvotes?: number;
   downvotes?: number;
   edited?: boolean;
+  replies?: Comment[];
 }
-
 
 interface PostDetailsProps {
   post: Post;
@@ -80,6 +82,7 @@ const PostDetails: React.FC<PostDetailsProps> = ({ post, comments: initialCommen
   const [authorUsername, setAuthorUsername] = useState("anonymous");
   const [communityName, setCommunityName] = useState("unknown");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [nestedComments, setNestedComments] = useState<Comment[]>([]);
   const toast = useToast();
   const router = useRouter();
 
@@ -112,6 +115,15 @@ const PostDetails: React.FC<PostDetailsProps> = ({ post, comments: initialCommen
     handleCommentSubmit(post, currentUser, commentText, setComments, setCommentText, setIsCommenting, toast);
   };
 
+  const onReplySubmit = (
+    parentId: string,
+    replyText: string,
+    setReplyText: (text: string) => void,
+    setIsReplying: (val: boolean) => void
+  ) => {
+    handleReplySubmit(post, currentUser, replyText, parentId, setComments, setReplyText, setIsReplying, toast);
+  };  
+
 useEffect(() => {
   const fetchPostDetails = async () => {
     try {
@@ -140,6 +152,34 @@ useEffect(() => {
 
   fetchPostDetails();
 }, [post.author, post.community]);
+
+  const buildCommentTree = (comments: Comment[]): Comment[] => {
+    const commentMap = new Map<string, Comment>();
+    const rootComments: Comment[] = [];
+
+    comments.forEach((comment) => {
+      comment.replies = [];
+      commentMap.set(comment.id, comment);
+    });
+
+    comments.forEach((comment) => {
+      if (comment.parentId) {
+        const parent = commentMap.get(comment.parentId);
+        if (parent) {
+          parent.replies?.push(comment);
+        }
+      } else {
+        rootComments.push(comment);
+      }
+    });
+
+    return rootComments;
+  };
+
+  useEffect(() => {
+    setNestedComments(buildCommentTree(comments));
+  }, [comments]);
+  
 
 const fetchComments = async () => {
   try {
@@ -180,11 +220,14 @@ const fetchComments = async () => {
           upvotes,
           downvotes,
           edited: data.edited ?? false,
+          parentId: data.parentId ?? null,
+          replies: [],
         };
       })
     );
 
     setComments(fetchedComments);
+    setNestedComments(buildCommentTree(fetchedComments));
 
   } catch (error) {
     console.error("Error fetching comments:", error);
@@ -279,7 +322,7 @@ const refreshCommentVotes = async (commentId: string) => {
   return (
     <PostDetailsView
       post={post}
-      comments={comments}
+      comments={nestedComments}
       currentUser={currentUser}
       communityName={communityName}
       authorUsername={authorUsername}
@@ -303,6 +346,7 @@ const refreshCommentVotes = async (commentId: string) => {
       setCommentToDelete={setCommentToDelete}
       setIsCommenting={setIsCommenting}
       setCommentText={setCommentText}
+      handleReplySubmit={onReplySubmit}
     />
   );
 }  

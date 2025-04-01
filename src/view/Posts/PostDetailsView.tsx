@@ -21,6 +21,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { useRouter } from "next/router";
 import DeletePost from "@/view/Modal/DeletePost";
 import { FaRegComments } from "react-icons/fa6";
+import { transparentize } from "@chakra-ui/theme-tools";
 
 
 interface Post {
@@ -41,11 +42,14 @@ interface Comment {
   username: string;
   content: string;
   createdAt: any;
+  parentId?: string | null;
   userVote?: "upvote" | "downvote" | null;
   upvotes?: number;
   downvotes?: number;
   edited?: boolean;
+  replies?: Comment[];
 }
+
 
 interface PostDetailsViewProps {
   post: Post;
@@ -73,6 +77,12 @@ interface PostDetailsViewProps {
   setCommentToDelete: (commentId: string | null) => void;
   setIsCommenting: (isCommenting: boolean) => void;
   setCommentText: (text: string) => void;
+  handleReplySubmit: (
+    parentId: string,
+    replyText: string,
+    setReplyText: (text: string) => void,
+    setIsReplying: (val: boolean) => void
+  ) => void;
 }
 
 const PostDetailsView: React.FC<PostDetailsViewProps> = ({
@@ -101,9 +111,219 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
   setCommentToDelete,
   setIsCommenting,
   setCommentText,
+  handleReplySubmit,
 }) => {
   const router = useRouter();
+
+  const CommentItem: React.FC<{
+    comment: Comment;
+    depth?: number;
+    currentUser: any;
+    handleCommentUpvote: (commentId: string) => void;
+    handleCommentDownvote: (commentId: string) => void;
+    handleDeleteComment: (commentId: string) => void;
+    commentVotes: { [key: string]: { upvoted: boolean, downvoted: boolean } };
+    setCommentToDelete: (commentId: string | null) => void;
+  }> = ({
+    comment,
+    depth = 0,
+    currentUser,
+    handleCommentUpvote,
+    handleCommentDownvote,
+    handleDeleteComment,
+    commentVotes,
+    setCommentToDelete
+  }) => {
+    const isAuthor = currentUser?.uid === comment.author;
+    const [isReplying, setIsReplying] = useState(false);
+    const [replyText, setReplyText] = useState("");
+
+    const formattedDate = comment.createdAt?.seconds
+      ? new Date(comment.createdAt.seconds * 1000).toLocaleString()
+      : "Unknown Date";
   
+    return (
+      <Box
+        ml={depth * 4}
+        pl={4}
+        pt={2}
+        pb={2}
+        position="relative"
+        key={comment.id}
+        _before={
+          depth > 0
+            ? {
+                content: '""',
+                position: "absolute",
+                top: 0,
+                left: -1,
+                width: "16px",
+                height: "100%",
+                borderLeft: "2px solid",
+                borderColor: transparentize("brand.100", 0.5), // 0.8 = 80% transparent
+              }
+            : {}
+        }
+        _after={
+          depth > 0
+            ? {
+                content: '""',
+                position: "absolute",
+                top: "16px", // vertical position of elbow
+                left: "-4px",
+                width: "16px", // horizontal part of L
+                borderTop: "2px solid",
+                borderColor: transparentize("brand.100", 0.5), // 0.8 = 80% transparent
+              }
+            : {}
+        }
+      >
+        <HStack spacing={2} color="brand.100" fontSize="sm">
+          <Link href={`/profile/${comment.author}`}>
+            <Text fontWeight="bold" color="brand.100" _hover={{ cursor: "pointer", color: "brand.600" }}>
+              u/{comment.username}
+            </Text>
+          </Link>
+          <Text>{formattedDate}</Text>
+          <Text>{comment.edited ? " (edited)" : ""}</Text>
+        </HStack>
+
+        <Text color="brand.100" mt={2}>
+          {comment.content}
+        </Text>
+
+        <HStack spacing={4} mt={2}>
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={() => handleCommentUpvote(comment.id)}
+            leftIcon={
+              commentVotes[comment.id]?.upvoted ? (
+                <BiSolidUpvote size={14} />
+              ) : (
+                <BiUpvote size={14} />
+              )
+            }
+          >
+            <Text fontSize="xs">{comment.upvotes}</Text>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={() => handleCommentDownvote(comment.id)}
+            leftIcon={
+              commentVotes[comment.id]?.downvoted ? (
+                <BiSolidDownvote size={14} />
+              ) : (
+                <BiDownvote size={14} />
+              )
+            }
+          >
+            <Text fontSize="xs">{comment.downvotes}</Text>
+          </Button>
+
+          <Button
+            size="xs"
+            variant="outline"
+            onClick={() => setIsReplying(!isReplying)}
+            color="brand.100"
+          >
+            {isReplying ? "Cancel" : "Reply"}
+          </Button>
+
+        </HStack>
+
+        {isReplying && (
+          <Box mt={2} ml={4}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleReplySubmit(comment.id, replyText, setReplyText, setIsReplying);
+              }}
+            >
+              <InputGroup>
+                <Input
+                  placeholder="Write a reply..."
+                  size="sm"
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  color="brand.100"
+                />
+              </InputGroup>
+              <HStack mt={1} spacing={2}>
+                <Button size="xs" type="submit" colorScheme="blue">
+                  Reply
+                </Button>
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => {
+                    setReplyText("");
+                    setIsReplying(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </HStack>
+            </form>
+          </Box>
+        )}
+
+        {isAuthor && (
+          <Box position="absolute" top={2} right={2}>
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                icon={<BsThreeDots size="18px" />}
+                variant="ghost"
+                color="brand.100"
+                size="sm"
+              />
+              <MenuList>
+                <MenuItem
+                  onClick={() =>
+                    router.push({
+                      pathname: `/comment/edit/${comment.id}`,
+                      query: {
+                        communityId: post.community,
+                        postId: post.id,
+                      },
+                    })
+                  }
+                >
+                  Edit
+                </MenuItem>
+                <MenuItem onClick={() => setCommentToDelete(comment.id)}>
+                  Delete
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </Box>
+        )}
+
+         {/* 🔁 Recursively render replies if any */}
+        {comment.replies && comment.replies.length > 0 && (
+          <VStack mt={2} spacing={2} align="stretch">
+            {comment.replies.map((reply) => (
+              <CommentItem
+                key={reply.id}
+                comment={reply}
+                depth={depth + 1}
+                currentUser={currentUser}
+                handleCommentUpvote={handleCommentUpvote}
+                handleCommentDownvote={handleCommentDownvote}
+                handleDeleteComment={handleDeleteComment}
+                commentVotes={commentVotes}
+                setCommentToDelete={setCommentToDelete}
+              />
+            ))}
+          </VStack>
+        )}
+      </Box>
+    );
+  };  
+
   return (
     <VStack align="stretch" spacing={0.5} maxW="stretch">
       <Box mt={5} ml={10}>
@@ -237,98 +457,20 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
         </Text>
 
         {comments.length === 0 ? (
-          <Text color="brand.100" mt={2}>
-            No comments yet under this post.
-          </Text>
+          <Text color="brand.100" mt={2}>No comments yet under this post.</Text>
         ) : (
-          comments.map((comment) => {
-            const isAuthor = currentUser?.uid === comment.author;
-            const formattedDate = comment.createdAt?.seconds
-              ? new Date(comment.createdAt.seconds * 1000).toLocaleString()
-              : "Unknown Date";
-
-            return (
-              <Box key={comment.id} p={4} borderRadius="md" mt={1} position="relative">
-                <HStack spacing={2} color="brand.100" fontSize="sm">
-                  <Link href={`/profile/${comment.author}`}>
-                    <Text fontWeight="bold" color="brand.100" _hover={{ cursor: "pointer", color: "brand.600" }}>
-                      u/{comment.username}
-                    </Text>
-                  </Link>
-                  <Text>{formattedDate}</Text>
-                  <Text>{comment.edited ? " (edited)" : ""}</Text>
-                </HStack>
-
-                <Text color="brand.100" mt={2}>
-                  {comment.content}
-                </Text>
-
-                <HStack spacing={4} mt={2}>
-                  <Button
-                    variant="outline"
-                    size="xs"
-                    onClick={() => handleCommentUpvote(comment.id)}
-                    leftIcon={
-                      commentVotes[comment.id]?.upvoted ? (
-                        <BiSolidUpvote size={14} />
-                      ) : (
-                        <BiUpvote size={14} />
-                      )
-                    }
-                  >
-                    <Text fontSize="xs">{comment.upvotes}</Text>
-                  </Button>
-
-                  <Button
-                    variant="outline"
-                    size="xs"
-                    onClick={() => handleCommentDownvote(comment.id)}
-                    leftIcon={
-                      commentVotes[comment.id]?.downvoted ? (
-                        <BiSolidDownvote size={14} />
-                      ) : (
-                        <BiDownvote size={14} />
-                      )
-                    }
-                  >
-                    <Text fontSize="xs">{comment.downvotes}</Text>
-                  </Button>
-                </HStack>
-
-                {isAuthor && (
-                  <Box position="absolute" top={2} right={2}>
-                    <Menu>
-                      <MenuButton
-                        as={IconButton}
-                        icon={<BsThreeDots size="18px" />}
-                        variant="ghost"
-                        color="brand.100"
-                        size="sm"
-                      />
-                      <MenuList>
-                        <MenuItem
-                          onClick={() =>
-                            router.push({
-                              pathname: `/comment/edit/${comment.id}`,
-                              query: {
-                                communityId: post.community,
-                                postId: post.id,
-                              },
-                            })
-                          }
-                        >
-                          Edit
-                        </MenuItem>
-                        <MenuItem onClick={() => setCommentToDelete(comment.id)}>
-                          Delete
-                        </MenuItem>
-                      </MenuList>
-                    </Menu>
-                  </Box>
-                )}
-              </Box>
-            );
-          })
+          comments.map((comment) => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              currentUser={currentUser}
+              handleCommentUpvote={handleCommentUpvote}
+              handleCommentDownvote={handleCommentDownvote}
+              handleDeleteComment={handleDeleteComment}
+              commentVotes={commentVotes}
+              setCommentToDelete={setCommentToDelete}
+            />
+          ))
         )}
       </Box>
 

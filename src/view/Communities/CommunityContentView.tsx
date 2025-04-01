@@ -132,6 +132,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, handleVote, setDeleteModal, u
               onClick={handleViewPost}
               leftIcon={<FaRegComment />}
             >
+              Comment
             </Button>
           </HStack>
         </Box>

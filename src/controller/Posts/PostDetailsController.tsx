@@ -101,14 +101,15 @@ import {
     const newComment = {
       content: commentText,
       author: currentUser?.uid || "unknown",
-      username: currentUser?.displayName || "Anonymous",
+      username: currentUser?.displayName?.length >= 3 ? currentUser.displayName : "Anonymous",
       createdAt: serverTimestamp(),
       edited: false,
-    };
+      parentId: null,
+    };    
   
     const docRef = await addDoc(commentsRef, newComment);
   
-    setComments((prev) => [...prev, { id: docRef.id, ...newComment }]);
+    setComments((prev) => [...prev, { id: docRef.id, ...newComment, replies: [] }]);
     setCommentText("");
     setIsCommenting(false);
   
@@ -165,3 +166,41 @@ import {
       await refreshCommentVotes(commentId);
     }
   };
+
+  export const handleReplySubmit = async (
+    post: any,
+    currentUser: any,
+    replyText: string,
+    parentId: string,
+    setComments: (updateFn: (prev: any[]) => any[]) => void,
+    setReplyText: (val: string) => void,
+    setIsReplying: (val: boolean) => void,
+    toast: (options: UseToastOptions) => void
+  ) => {
+    if (replyText.trim() === "") return;
+  
+    const commentsRef = collection(firestore, "subquivers", post.community, "posts", post.id, "comments");
+  
+    const newReply = {
+      content: replyText,
+      author: currentUser?.uid || "unknown",
+      username: currentUser?.displayName || "Anonymous",
+      createdAt: serverTimestamp(),
+      edited: false,
+      parentId,
+    };
+  
+    const docRef = await addDoc(commentsRef, newReply);
+  
+    setComments((prev) => [...prev, { id: docRef.id, ...newReply, replies: [] }]);
+    setReplyText("");
+    setIsReplying(false);
+  
+    toast({
+      title: "Reply added successfully!",
+      status: "success",
+      duration: 3000,
+      isClosable: true,
+    });
+  };
+  
