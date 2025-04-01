@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Text,
@@ -17,7 +17,6 @@ import {
   Link,
 } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
-import { BsThreeDots } from "react-icons/bs";
 import DeletePost from "@/view/Modal/DeletePost";
 import router from "next/router";
 import { FaRegComment } from "react-icons/fa6";
@@ -26,6 +25,10 @@ import { BiSolidDownvote } from "react-icons/bi";
 import { BiUpvote } from "react-icons/bi";
 import { BiDownvote } from "react-icons/bi";
 import { auth } from "@/model/firebase/clientApp";
+import { handleDeleteSubquiver, handleEditSubquiver } from "@/controller/Communities/CommunityContentController";
+import EditSubquiverModalView from "@/view/Modal/EditSubquiverModalView"; 
+import DeleteSubquiverModalView from "@/view/Modal/DeleteSubquiverModalView"; 
+import { BsThreeDots, BsThreeDotsVertical } from "react-icons/bs";
 
 const user = auth.currentUser;
 
@@ -161,6 +164,10 @@ interface CommunityContentViewProps {
   updateUserVote: (postId: string, vote: "upvote" | "downvote" | null) => void;
   user: { uid: string | null } | null;
   authorProfilePic: string | null;
+  onDeleteSubquiver: () => void;
+  onEditSubquiver: () => void;
+  communityId: string; // Add communityId to the interface
+  description: string; // Add description to the interface
 }
 
 const CommunityContentView: React.FC<CommunityContentViewProps> = ({
@@ -179,7 +186,14 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
   checkMembership,
   updateVoteCounts,
   updateUserVote,
+  communityId, // Add communityId to the 
+  description, // Add description to the props
 }) => {
+
+  const [isEditModalOpen, setEditModalOpen] = useState(false); // State for controlling the edit modal
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const toast = useToast();
+
     return (
         <Box width="full">
           <Box width="full" height="150px" bg="brand.100" position="relative">
@@ -193,20 +207,30 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
               bg="brand.100"
             />
           </Box>
-    
+          
           <Box ml={100} px={4} pt={2} pb={4}>
             <HStack justify="space-between" align="center">
               <Text color="brand.100" fontSize="35" fontWeight="bold">
-                q/{name}
+          q/{name}
               </Text>
-    
-              <HStack spacing={3}>
-                <Button leftIcon={<FaPlus />} size="md" variant="outline" onClick={handleCreatePost}>
-                  Create Post
-                </Button>
-                <Button size="md" variant="solid" onClick={joined ? handleLeave : handleJoin}>
-                  {joined ? "Joined" : "Join"}
-                </Button>
+
+            <HStack spacing={3}>
+
+          <Menu>
+            <MenuButton as={IconButton} icon={<BsThreeDotsVertical />} variant="outline" />
+              <MenuList>
+                <MenuItem onClick={() => setEditModalOpen(true)}>Edit Subquiver</MenuItem>
+                <MenuItem onClick={() => setDeleteModalOpen(true)}>Delete Subquiver</MenuItem>
+              </MenuList>
+          </Menu>
+
+          <Button leftIcon={<FaPlus />} size="md" variant="outline" onClick={handleCreatePost}>
+            Create Post
+          </Button>
+  
+          <Button size="md" variant="solid" onClick={joined ? handleLeave : handleJoin}>
+            {joined ? "Joined" : "Join"}
+          </Button>
               </HStack>
             </HStack>
           </Box>
@@ -233,10 +257,48 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
               </Text>
             )}
           </VStack>
+
+           {/* Edit Subquiver Modal */}
+           <EditSubquiverModalView
+            isOpen={isEditModalOpen}
+            onClose={() => setEditModalOpen(false)} // Remove the extraneous "CCC"
+            communityId={communityId}
+            communityName={name}
+            communityDescription={description} // Pass the description here
+            onEdit={(communityId: string, newName: string, newDescription: string) =>
+              handleEditSubquiver(
+                communityId,
+                newName,
+                newDescription,
+                (options) => toast({ ...options, status: options.status as "info" | "warning" | "success" | "error" | "loading" }),
+                fetchPosts,
+                router
+              )
+            } // Wrap the handler to match the expected signature
+          />
+
+           {/* Delete Subquiver Modal */}
+          <DeleteSubquiverModalView
+            isOpen={isDeleteModalOpen}
+            onClose={() => setDeleteModalOpen(false)}
+            onDelete={() => {
+            handleDeleteSubquiver(
+            communityId,
+            (options) =>
+            toast({
+              ...options,
+              status: options.status as "info" | "warning" | "success" | "error" | "loading",
+            }),
+            router
+            );
+            setDeleteModalOpen(false); // Close modal after deletion
+            }}
+          />
     
           <DeletePost isOpen={deleteModal.open} onClose={() => setDeleteModal({ open: false, postId: null })} onDelete={handleConfirmDelete} />
         </Box>
-      );
-    };
+    );
+};
+
 
 export default CommunityContentView;
