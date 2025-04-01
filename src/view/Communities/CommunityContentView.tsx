@@ -14,6 +14,7 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
+  Link,
 } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
 import { BsThreeDots } from "react-icons/bs";
@@ -83,7 +84,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, handleVote, setDeleteModal, u
             />
             <VStack spacing={0} align="start">
               <Text fontWeight="bold" color="brand.100">{post.title}</Text>
-              <Text fontSize="xs" color="brand.100">u/{post.username}</Text>
+              <Link href={`/profile/${post.author}`}>
+                <Text fontSize="xs" color="brand.100" _hover={{ color: "brand.600", cursor: "pointer" }}>
+                  u/{post.username}
+                </Text>
+              </Link>
             </VStack>
           </HStack>
   

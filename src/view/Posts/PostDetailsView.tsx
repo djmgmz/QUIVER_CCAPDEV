@@ -14,6 +14,7 @@ import {
   chakra,
   Input,
   InputGroup,
+  Link,
 } from "@chakra-ui/react";
 import { BiSolidUpvote, BiSolidDownvote, BiDownvote, BiUpvote } from "react-icons/bi";
 import { BsThreeDots } from "react-icons/bs";
@@ -106,9 +107,14 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
   return (
     <VStack align="stretch" spacing={0.5} maxW="stretch">
       <Box mt={5} ml={10}>
-        <Text fontSize="20" color="brand.100">
-          in <Text as="span" color="brand.100">q/{communityName}</Text>
-        </Text>
+      <Text fontSize="20" color="brand.100">
+        in{" "}
+        <Link href={`/subquiver/${communityName}`}>
+          <Text as="span" color="brand.100" fontWeight="semibold" _hover={{ cursor: "pointer", color: "brand.600" }}>
+            q/{communityName}
+          </Text>
+        </Link>
+      </Text>
       </Box>
 
       <Box position="relative" maxW="1350px" ml={82}>
@@ -131,7 +137,11 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
 
       <Box ml={35}>
         <HStack spacing={2} color="brand.600" fontSize="sm" ml={69}>
-          <Text fontSize="17">u/{authorUsername}</Text>
+          <Link href={`/profile/${post.author}`}>
+            <Text fontSize="17" color="brand.100" fontWeight="medium" _hover={{ cursor: "pointer", color: "brand.600" }}>
+              u/{authorUsername}
+            </Text>
+          </Link>
           <Text>{formattedDate}</Text>
           <Text>{post.edited ? " (edited)" : ""}</Text>
         </HStack>
@@ -240,7 +250,11 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
             return (
               <Box key={comment.id} p={4} borderRadius="md" mt={1} position="relative">
                 <HStack spacing={2} color="brand.100" fontSize="sm">
-                  <Text fontWeight="bold">u/{comment.username}</Text>
+                  <Link href={`/profile/${comment.author}`}>
+                    <Text fontWeight="bold" color="brand.100" _hover={{ cursor: "pointer", color: "brand.600" }}>
+                      u/{comment.username}
+                    </Text>
+                  </Link>
                   <Text>{formattedDate}</Text>
                   <Text>{comment.edited ? " (edited)" : ""}</Text>
                 </HStack>
