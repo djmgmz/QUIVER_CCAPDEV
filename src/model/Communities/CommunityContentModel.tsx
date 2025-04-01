@@ -44,6 +44,8 @@ import {
   handleCreatePost as create,
   handleConfirmDelete as confirmDelete,
   handleVote as vote,
+  handleEditSubquiver,
+  handleDeleteSubquiver
 } from "../../controller/Communities/CommunityContentController";
 
 interface Post {
@@ -294,8 +296,25 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
       updateUserVote(postId, type);
     }
   };
-  
-  
+
+  const onEditSubquiver = () => {
+    handleEditSubquiver(
+      subquiverId, // Pass the correct subquiverId
+      "Updated Name", // Provide a valid string value for newName
+      "Updated Description", // Provide a valid string value for newDescription
+      (options) => toast({ ...options, status: options.status as "info" | "warning" | "success" | "error" | "loading" }), // Explicitly type options
+      fetchPosts, // Add the missing argument (fetchPosts function)
+      router
+    );
+  }; 
+
+  const onDeleteSubquiver = () => {
+    handleDeleteSubquiver(
+      subquiverId, // Pass the correct subquiverId
+      (options) => toast({ ...options, status: options.status as "info" | "warning" | "success" | "error" | "loading" }), // Explicitly type options
+      router // Pass the router object to handle redirection
+    );
+  };
 
   return (
     <CommunityContentView
@@ -315,6 +334,11 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
       updateVoteCounts={updateVoteCounts}
       updateUserVote={updateUserVote}
       user={user}
+      onEditSubquiver={onEditSubquiver}
+      onDeleteSubquiver={onDeleteSubquiver} 
+      description={"Community Description"}
+      authorProfilePic={user?.photoURL || null} // Provide the author's profile picture
+      communityId={subquiverId} // Provide the community ID
     />
   );
   
@@ -328,3 +352,7 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
   
 }
 export default CommunityContent;
+
+function newName(): Promise<void> {
+  throw new Error("Function not implemented.");
+}
