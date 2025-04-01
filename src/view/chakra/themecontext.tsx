@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 const colorThemes = {
   default: {
@@ -31,7 +31,22 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState(colorThemes.default);
+  const [theme, setTheme] = useState<typeof colorThemes.default>(colorThemes.default);
+  const [isLoaded, setIsLoaded] = useState(false); 
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("theme") ?? "default";
+      setTheme(savedTheme === "alternate" ? colorThemes.alternate : colorThemes.default);
+    }
+    setIsLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("theme", theme === colorThemes.default ? "default" : "alternate");
+    }
+  }, [theme, isLoaded]);
 
   const toggleTheme = () => {
     setTheme((prevTheme) =>
