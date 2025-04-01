@@ -15,6 +15,7 @@ import {
   Input,
   InputGroup,
   Link,
+  Avatar,
 } from "@chakra-ui/react";
 import { BiSolidUpvote, BiSolidDownvote, BiDownvote, BiUpvote } from "react-icons/bi";
 import { BsThreeDots } from "react-icons/bs";
@@ -40,6 +41,7 @@ interface Comment {
   id: string;
   author: string;
   username: string;
+  profilePicture?: string | null;
   content: string;
   createdAt: any;
   parentId?: string | null;
@@ -57,6 +59,7 @@ interface PostDetailsViewProps {
   currentUser: any;
   communityName: string;
   authorUsername: string;
+  authorProfilePic: string | null;
   formattedDate: string;
   postVotes: { upvotes: number; downvotes: number };
   commentVotes: { [key: string]: { upvoted: boolean; downvoted: boolean } };
@@ -91,6 +94,7 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
   currentUser,
   communityName,
   authorUsername,
+  authorProfilePic,
   formattedDate,
   postVotes,
   commentVotes,
@@ -179,6 +183,15 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
         }
       >
         <HStack spacing={2} color="brand.100" fontSize="sm">
+          <Avatar
+            size="xs"
+            src={comment.profilePicture || "/images/guestprofilepic.jpeg"}
+            bg="gray.400"
+            sx={{
+              border: "1px solid",
+              borderColor: "brand.100",
+            }}
+          />
           <Link href={`/profile/${comment.author}`}>
             <Text fontWeight="bold" color="brand.100" _hover={{ cursor: "pointer", color: "brand.600" }}>
               u/{comment.username}
@@ -361,6 +374,16 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
 
       <Box ml={35}>
         <HStack spacing={2} color="brand.600" fontSize="sm" ml={69}>
+          <Avatar
+            size="sm"
+            src={authorProfilePic || "/images/guestprofilepic.jpeg"}
+            name={authorUsername}
+            bg="gray.400"
+            sx={{
+              border: "1px solid",
+              borderColor: "brand.100",
+            }}
+          />
           <Link href={`/profile/${post.author}`}>
             <Text fontSize="17" color="brand.100" fontWeight="medium" _hover={{ cursor: "pointer", color: "brand.600" }}>
               u/{authorUsername}

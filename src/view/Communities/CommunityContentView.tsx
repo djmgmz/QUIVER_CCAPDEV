@@ -160,6 +160,7 @@ interface CommunityContentViewProps {
   updateVoteCounts: (postId: string, type: "upvote" | "downvote", delta: number) => void;
   updateUserVote: (postId: string, vote: "upvote" | "downvote" | null) => void;
   user: { uid: string | null } | null;
+  authorProfilePic: string | null;
 }
 
 const CommunityContentView: React.FC<CommunityContentViewProps> = ({

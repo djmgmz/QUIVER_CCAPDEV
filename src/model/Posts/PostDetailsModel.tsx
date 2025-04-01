@@ -80,6 +80,7 @@ const PostDetails: React.FC<PostDetailsProps> = ({ post, comments: initialCommen
   );
   const [isCommenting, setIsCommenting] = useState(false);
   const [authorUsername, setAuthorUsername] = useState("anonymous");
+  const [authorProfilePic, setAuthorProfilePic] = useState<string | null>(null);
   const [communityName, setCommunityName] = useState("unknown");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [nestedComments, setNestedComments] = useState<Comment[]>([]);
@@ -129,7 +130,9 @@ useEffect(() => {
     try {
       const userDoc = await getDoc(doc(firestore, "users", post.author));
       if (userDoc.exists()) {
-        setAuthorUsername(userDoc.data().username || "anonymous");
+        const userData = userDoc.data();
+        setAuthorUsername(userData.username || "anonymous");
+        setAuthorProfilePic(userData.profilePicture || null);
       }
 
       const communityDoc = await getDoc(doc(firestore, "subquivers", post.community));
@@ -198,22 +201,24 @@ const fetchComments = async () => {
     const fetchedComments: Comment[] = await Promise.all(
       querySnapshot.docs.map(async (docSnapshot) => {
         const data = docSnapshot.data();
-
+    
         const userDoc = await getDoc(doc(firestore, "users", data.author));
         const username = userDoc.exists() ? userDoc.data().username || "Anonymous" : "Anonymous";
-
+        const profilePicture = userDoc.exists() ? userDoc.data().profilePicture || null : null;
+    
         const voteDoc = await getDoc(
           doc(firestore, `subquivers/${post.community}/posts/${post.id}/comments/${docSnapshot.id}/votes/${currentUser?.uid}`)
         );
-
+    
         const userVote = voteDoc.exists() ? voteDoc.data().type : null;
-
+    
         const { upvotes, downvotes } = await countVotes("comment", docSnapshot.id);
-
+    
         return {
           id: docSnapshot.id,
           author: data.author,
           username,
+          profilePicture,
           content: data.content,
           createdAt: data.createdAt,
           userVote,
@@ -347,6 +352,7 @@ const refreshCommentVotes = async (commentId: string) => {
       setIsCommenting={setIsCommenting}
       setCommentText={setCommentText}
       handleReplySubmit={onReplySubmit}
+      authorProfilePic={authorProfilePic}
     />
   );
 }  
