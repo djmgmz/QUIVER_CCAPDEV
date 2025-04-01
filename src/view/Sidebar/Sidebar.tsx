@@ -16,6 +16,14 @@ const Sidebar = () => {
     router.push("/");
   };
 
+  const handlePopularClick = () => {
+    router.push("/?view=popular");
+  };
+  
+  const handleRecentClick = () => {
+    router.push("/?view=recent");
+  };
+
   return (
     <Box
       bgColor="brand.200"
@@ -38,6 +46,7 @@ const Sidebar = () => {
         </Button>
 
         <Button
+          onClick={handlePopularClick}
           leftIcon={<DlsuStarIcon />}
           variant="ghost"
           justifyContent="flex-start"
@@ -46,6 +55,7 @@ const Sidebar = () => {
         </Button>
 
         <Button
+          onClick={handleRecentClick}
           leftIcon={<Icon as={FaBinoculars} boxSize={6} color="brand.100" />}
           variant="ghost"
           justifyContent="flex-start"

@@ -1,9 +1,10 @@
-import React from "react";
-import { Box, SimpleGrid, Text, HStack, Spinner } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Box, SimpleGrid, Text, HStack, Spinner, Menu, MenuButton, MenuItem, MenuList, } from "@chakra-ui/react";
 import Link from "next/link";
 import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
 import { FaComment } from "react-icons/fa6";
 import { Timestamp } from "firebase/firestore";
+import { TiArrowSortedDown } from "react-icons/ti";
 
 interface Post {
   id: string;
@@ -20,11 +21,93 @@ interface Post {
 interface PostsGridViewProps {
   posts: Post[];
   loading: boolean;
+  isPopularView: boolean;
+  timePeriod: "today" | "week" | "month";
+  setTimePeriod: React.Dispatch<React.SetStateAction<"today" | "week" | "month">>;
 }
 
-const PostsGridView: React.FC<PostsGridViewProps> = ({ posts, loading }) => {
+const PostsGridView: React.FC<PostsGridViewProps> = ({
+  posts,
+  loading,
+  isPopularView,
+  timePeriod,
+  setTimePeriod,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
   return (
     <Box p={6}>
+      {isPopularView && (
+        <Box mb={4}>
+        <Text mb={1} color="brand.100" fontWeight="semibold">
+          Showing popular posts from:
+        </Text>
+      
+        <Menu isOpen={isOpen} onClose={() => setIsOpen(false)}>
+        <MenuButton
+              as={Box}
+              cursor="pointer"
+              display="flex"
+              alignItems="center"
+              bg="brand.200"
+              color="brand.100"
+              px={4}
+              py={2}
+              borderRadius="md"
+              onClick={() => setIsOpen(!isOpen)}
+              maxW="200px"
+              border="1px solid"
+              borderColor="brand.100"
+            >
+            <HStack justify="space-between" w="full">
+              <Text fontWeight="medium" fontSize="sm">
+                {timePeriod === "today"
+                  ? "Today"
+                  : timePeriod === "week"
+                  ? "This Week"
+                  : "This Month"}
+              </Text>
+              <TiArrowSortedDown
+                style={{
+                  transition: "transform 0.2s",
+                  transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+                }}
+              />
+            </HStack>
+          </MenuButton>
+      
+          <MenuList bg="brand.200" borderColor="brand.100">
+            <MenuItem
+              onClick={() => {
+                setTimePeriod("today");
+                setIsOpen(false);
+              }}
+              _hover={{ bg: "brand.100", color: "brand.200" }}
+            >
+              Today
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setTimePeriod("week");
+                setIsOpen(false);
+              }}
+              _hover={{ bg: "brand.100", color: "brand.200" }}
+            >
+              This Week
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                setTimePeriod("month");
+                setIsOpen(false);
+              }}
+              _hover={{ bg: "brand.100", color: "brand.200" }}
+            >
+              This Month
+            </MenuItem>
+          </MenuList>
+        </Menu>
+      </Box>
+      )}
+
       {loading ? (
         <Spinner size="xl" />
       ) : posts.length > 0 ? (

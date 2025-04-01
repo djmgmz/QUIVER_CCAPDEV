@@ -1,17 +1,8 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  SimpleGrid,
-  Text,
-  HStack,
-  VStack,
-  Spinner,
   useToast,
 } from "@chakra-ui/react";
-import Link from "next/link";
-import { BsThreeDots } from "react-icons/bs";
-import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
-import { FaComment } from "react-icons/fa6";
 import {
   collection,
   collectionGroup,
@@ -22,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { firestore } from "@/model/firebase/clientApp";
 import PostsGridView from "@/view/Posts/PostsView";
+import { useRouter } from "next/router";
 
 interface Post {
   id: string;
@@ -40,23 +32,44 @@ interface Post {
 const PostsGrid: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timePeriod, setTimePeriod] = useState<"today" | "week" | "month">("month");
+
+  const router = useRouter();
   const toast = useToast();
+
+  const isPopularView = router.query.view === "popular";
+
+  const getDaysSince = (timestamp: Timestamp | null) => {
+    if (!timestamp) return Infinity;
+    const now = new Date();
+    const createdAt = timestamp.toDate();
+    const diffMs = now.getTime() - createdAt.getTime();
+    return diffMs / (1000 * 60 * 60 * 24); // days
+  };
+
+  const isWithinPeriod = (timestamp: Timestamp | null, period: "today" | "week" | "month") => {
+    if (!timestamp) return false;
+    const now = new Date();
+    const createdAt = timestamp.toDate();
+    const diffMs = now.getTime() - createdAt.getTime();
+
+    switch (period) {
+      case "today":
+        return diffMs < 1000 * 60 * 60 * 24;
+      case "week":
+        return diffMs < 1000 * 60 * 60 * 24 * 7;
+      case "month":
+        return diffMs < 1000 * 60 * 60 * 24 * 30;
+      default:
+        return true;
+    }
+  };
 
   const fetchAllPosts = async () => {
     setLoading(true);
     try {
       const postsQuery = collectionGroup(firestore, "posts");
       const querySnapshot = await getDocs(postsQuery);
-
-      if (querySnapshot.empty) {
-        toast({
-          title: "No posts found across subquivers.",
-          status: "info",
-          duration: 3000,
-          isClosable: true,
-        });
-        return;
-      }
 
       const postsData = await Promise.all(
         querySnapshot.docs.map(async (docItem) => {
@@ -74,10 +87,10 @@ const PostsGrid: React.FC = () => {
             ? subquiverDoc.data().name || "unknown"
             : "unknown";
 
-          // Count votes
           const votesSnapshot = await getDocs(
             collection(firestore, `subquivers/${subquiverId}/posts/${docItem.id}/votes`)
           );
+
           let upvotes = 0;
           let downvotes = 0;
           votesSnapshot.forEach((voteDoc) => {
@@ -86,7 +99,6 @@ const PostsGrid: React.FC = () => {
             if (vote.type === "downvote") downvotes++;
           });
 
-          // Count comments
           const commentsSnapshot = await getDocs(
             collection(firestore, `subquivers/${subquiverId}/posts/${docItem.id}/comments`)
           );
@@ -107,7 +119,26 @@ const PostsGrid: React.FC = () => {
         })
       );
 
-      setPosts(postsData);
+      let finalPosts = postsData;
+
+      if (isPopularView) {
+        finalPosts = postsData
+          .filter((post) => isWithinPeriod(post.createdAt || null, timePeriod))
+          .map((post) => ({
+            ...post,
+            popularityScore: (post.upvotes + post.downvotes) / getDaysSince(post.createdAt || null),
+          }))
+          .sort((a, b) => b.popularityScore - a.popularityScore);
+      } else if (router.query.view === "recent") {
+        finalPosts = postsData.sort((a, b) => {
+          const timeA = a.createdAt?.toMillis() || 0;
+          const timeB = b.createdAt?.toMillis() || 0;
+          return timeB - timeA;
+        });
+      }
+
+
+      setPosts(finalPosts);
     } catch (error) {
       console.error("Error fetching posts:", error);
       toast({
@@ -124,8 +155,17 @@ const PostsGrid: React.FC = () => {
 
   useEffect(() => {
     fetchAllPosts();
-  }, []);
+  }, [router.query.view, timePeriod]);
 
-  return <PostsGridView posts={posts} loading={loading} />;
-}
+  return (
+    <PostsGridView
+      posts={posts}
+      loading={loading}
+      isPopularView={isPopularView}
+      timePeriod={timePeriod}
+      setTimePeriod={setTimePeriod}
+    />
+  );
+};
+
 export default PostsGrid;
