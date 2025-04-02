@@ -166,8 +166,10 @@ interface CommunityContentViewProps {
   authorProfilePic: string | null;
   onDeleteSubquiver: () => void;
   onEditSubquiver: () => void;
-  communityId: string; // Add communityId to the interface
-  description: string; // Add description to the interface
+  communityId: string;
+  description: string;
+  bannerImageURL?: string | null;
+  iconImageURL?: string | null;
 }
 
 const CommunityContentView: React.FC<CommunityContentViewProps> = ({
@@ -186,27 +188,44 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
   checkMembership,
   updateVoteCounts,
   updateUserVote,
-  communityId, // Add communityId to the 
-  description, // Add description to the props
+  communityId,
+  description,
+  bannerImageURL,
+  iconImageURL,
 }) => {
 
-  const [isEditModalOpen, setEditModalOpen] = useState(false); // State for controlling the edit modal
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const toast = useToast();
 
     return (
         <Box width="full">
-          <Box width="full" height="150px" bg="brand.100" position="relative">
+          <Box
+            width="full"
+            height="150px"
+            position="relative"
+            sx={{
+              bg: bannerImageURL ? "transparent" : "brand.100",
+              backgroundImage: bannerImageURL ? `url(${bannerImageURL})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+            }}
+          >
             <Avatar
               size="xl"
               position="absolute"
               bottom="-40px"
               left="20px"
-              border="4px solid"
-              borderColor="white"
-              bg="brand.100"
+              bg="gray.400"
+              src={iconImageURL || "/images/guestprofilepic.jpeg"}
+              sx={{
+                border: "4px solid",
+                borderColor: "white",
+              }}
             />
           </Box>
+
           
           <Box ml={100} px={4} pt={2} pb={4}>
             <HStack justify="space-between" align="center">
@@ -258,13 +277,12 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
             )}
           </VStack>
 
-           {/* Edit Subquiver Modal */}
            <EditSubquiverModalView
             isOpen={isEditModalOpen}
-            onClose={() => setEditModalOpen(false)} // Remove the extraneous "CCC"
+            onClose={() => setEditModalOpen(false)}
             communityId={communityId}
             communityName={name}
-            communityDescription={description} // Pass the description here
+            communityDescription={description}
             onEdit={(communityId: string, newName: string, newDescription: string) =>
               handleEditSubquiver(
                 communityId,
@@ -274,10 +292,9 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
                 fetchPosts,
                 router
               )
-            } // Wrap the handler to match the expected signature
+            }
           />
 
-           {/* Delete Subquiver Modal */}
           <DeleteSubquiverModalView
             isOpen={isDeleteModalOpen}
             onClose={() => setDeleteModalOpen(false)}
@@ -291,7 +308,7 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
             }),
             router
             );
-            setDeleteModalOpen(false); // Close modal after deletion
+            setDeleteModalOpen(false);
             }}
           />
     

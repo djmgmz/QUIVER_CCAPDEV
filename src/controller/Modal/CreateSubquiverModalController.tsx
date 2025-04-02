@@ -1,5 +1,6 @@
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { auth, firestore } from "../../model/firebase/clientApp";
+import { addDoc, collection, doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { auth, firestore, storage } from "@/model/firebase/clientApp";
 
 export const handleNext = (
   step: number,
@@ -32,17 +33,39 @@ export const handleBack = (setStep: (val: number | ((prev: number) => number)) =
 export const handleCreateSubquiver = async (
   communityName: string,
   description: string,
+  bannerFile: File | null,
+  iconFile: File | null,
   onClose: () => void,
   toast: ReturnType<typeof import("@chakra-ui/react").useToast>
 ) => {
   try {
-    await addDoc(collection(firestore, "subquivers"), {
+    const creatorId = auth.currentUser?.uid;
+    const timestamp = serverTimestamp();
+
+    let bannerImageURL = "";
+    let iconImageURL = "";
+
+    const subquiverId = doc(collection(firestore, "subquivers")).id;
+
+    if (bannerFile) {
+      const bannerRef = ref(storage, `subquivers/${subquiverId}/banner`);
+      const bannerSnap = await uploadBytes(bannerRef, bannerFile);
+      bannerImageURL = await getDownloadURL(bannerSnap.ref);
+    }
+
+    if (iconFile) {
+      const iconRef = ref(storage, `subquivers/${subquiverId}/icon`);
+      const iconSnap = await uploadBytes(iconRef, iconFile);
+      iconImageURL = await getDownloadURL(iconSnap.ref);
+    }
+
+    await setDoc(doc(firestore, "subquivers", subquiverId), {
       name: communityName,
       description,
-      createdAt: serverTimestamp(),
-      creatorId: auth.currentUser?.uid,
-      bannerImageURL: "",
-      iconImageURL: "",
+      createdAt: timestamp,
+      creatorId,
+      bannerImageURL,
+      iconImageURL,
       memberCount: 1,
     });
 

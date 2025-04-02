@@ -43,6 +43,8 @@ const CreateSubquiverModal: React.FC<CreateSubquiverModalProps> = ({
   const [description, setDescription] = useState("");
   const [nameError, setNameError] = useState("");
   const [descError, setDescError] = useState("");
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [iconFile, setIconFile] = useState<File | null>(null);
   const toast = useToast();
 
   useEffect(() => {
@@ -68,26 +70,37 @@ const CreateSubquiverModal: React.FC<CreateSubquiverModalProps> = ({
   const handleBack = () => handleBackFn(setStep);
 
   const handleCreateSubquiver = async () =>
-    await handleCreateSubquiverFn(communityName, description, onClose, toast);
+    await handleCreateSubquiverFn(
+      communityName,
+      description,
+      bannerFile,
+      iconFile,
+      onClose,
+      toast
+    );  
 
   return (
     <CreateSubquiverModalView
-      isOpen={isOpen}
-      onClose={onClose}
-      step={step}
-      setStep={setStep}
-      communityName={communityName}
-      setCommunityName={setCommunityName}
-      description={description}
-      setDescription={setDescription}
-      nameError={nameError}
-      setNameError={setNameError}
-      descError={descError}
-      setDescError={setDescError}
-      handleNext={handleNext}
-      handleBack={handleBack}
-      handleCreateSubquiver={handleCreateSubquiver}
-    />
+    isOpen={isOpen}
+    onClose={onClose}
+    step={step}
+    setStep={setStep}
+    communityName={communityName}
+    setCommunityName={setCommunityName}
+    description={description}
+    setDescription={setDescription}
+    nameError={nameError}
+    setNameError={setNameError}
+    descError={descError}
+    setDescError={setDescError}
+    handleNext={handleNext}
+    handleBack={handleBack}
+    handleCreateSubquiver={handleCreateSubquiver}
+    bannerFile={bannerFile}
+    setBannerFile={setBannerFile}
+    iconFile={iconFile}
+    setIconFile={setIconFile}
+  />
   );
 };
 

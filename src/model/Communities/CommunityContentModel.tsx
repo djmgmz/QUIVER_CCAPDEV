@@ -47,6 +47,7 @@ import {
   handleEditSubquiver,
   handleDeleteSubquiver
 } from "../../controller/Communities/CommunityContentController";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 interface Post {
   id: string;
@@ -73,7 +74,10 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
   const [joined, setJoined] = useState(false);
   const setAuthModal = useSetRecoilState(authModalState);
   const [deleteModal, setDeleteModal] = useRecoilState(deletePostModalState);
-  const user = auth.currentUser;
+  const [bannerImageURL, setBannerImageURL] = useState<string | null>(null);
+  const [iconImageURL, setIconImageURL] = useState<string | null>(null);
+  const [description, setDescription] = useState<string>("Community Description");
+  const [user, loadingUser] = useAuthState(auth);
   const router = useRouter();
   const toast = useToast();
 
@@ -92,7 +96,6 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
           let username = "anonymous";
           let profilePicture: string | null = null;
   
-          // Fetch Username and Profile Picture
           if (postData.author) {
             const userDoc = await getDoc(doc(firestore, "users", postData.author));
             if (userDoc.exists()) {
@@ -102,8 +105,6 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
             }
           }
 
-  
-          // Count Upvotes and Downvotes
           const votesSnapshot = await getDocs(
             collection(firestore, `subquivers/${subquiverId}/posts/${docItem.id}/votes`)
           );
@@ -151,12 +152,26 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
   };
 
   useEffect(() => {
+    const fetchSubquiverMetadata = async () => {
+      try {
+        const subquiverDoc = await getDoc(doc(firestore, "subquivers", subquiverId));
+        if (subquiverDoc.exists()) {
+          const data = subquiverDoc.data();
+          setBannerImageURL(data.bannerImageURL || null);
+          setIconImageURL(data.iconImageURL || null);
+          setDescription(data.description || "No description available");
+        }
+      } catch (error) {
+        console.error("Error fetching subquiver metadata:", error);
+      }
+    };
+  
     if (subquiverId) {
+      fetchSubquiverMetadata();
       fetchPosts();
       checkMembership();
     }
-  }, [subquiverId, user]);
-
+  }, [subquiverId, user]);  
 
   const updateVoteCounts = (postId: string, type: "upvote" | "downvote", delta: number) => {
     setPosts((prevPosts) =>
@@ -172,74 +187,6 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
     setPosts((prevPosts) =>
       prevPosts.map((p) => (p.id === postId ? { ...p, userVote: vote } : p))
     );
-  };
-
-  const handleJoin = (
-    user: any,
-    subquiverId: string,
-    setJoined: (val: boolean) => void,
-    toast: ReturnType<typeof useToast>,
-    setAuthModal: ReturnType<typeof useSetRecoilState>
-  ) => {
-    join(user, subquiverId);
-    setJoined(true);
-    toast({ title: "Joined Community!", status: "success", duration: 3000, isClosable: true });
-  };
-  
-  const handleLeave = (
-    user: any,
-    subquiverId: string,
-    setJoined: (val: boolean) => void,
-    toast: ReturnType<typeof useToast>
-  ) => {
-    leave(user, subquiverId);
-    setJoined(false);
-    toast({ title: "Left Community!", status: "info", duration: 3000, isClosable: true });
-  };
-  
-  const handleCreatePost = (
-    user: any,
-    name: string,
-    router: ReturnType<typeof useRouter>,
-    setAuthModal: ReturnType<typeof useSetRecoilState>
-  ) => {
-    create(user, name, router);
-  };
-  
-  const handleConfirmDelete = (
-    subquiverId: string,
-    postId: string,
-    toast: ReturnType<typeof useToast>,
-    fetchPosts: () => void,
-    setDeleteModal: ReturnType<typeof useRecoilState>[1]
-  ) => {
-    confirmDelete(subquiverId, postId);
-    toast({ title: "Post and its comments deleted successfully!", status: "success", duration: 3000, isClosable: true });
-    fetchPosts();
-    setDeleteModal({ open: false, postId: null });
-  };
-  
-  const handleVote = async (
-    user: any,
-    subquiverId: string,
-    postId: string,
-    type: "upvote" | "downvote",
-    setAuthModal: ReturnType<typeof useSetRecoilState>,
-    updateVoteCounts: (id: string, type: "upvote" | "downvote", delta: number) => void,
-    updateUserVote: (id: string, vote: "upvote" | "downvote" | null) => void
-  ) => {
-    const result = await vote(user, subquiverId, postId, type);
-    if (result === "added") {
-      updateVoteCounts(postId, type, 1);
-      updateUserVote(postId, type);
-    } else if (result === "removed") {
-      updateVoteCounts(postId, type, -1);
-      updateUserVote(postId, null);
-    } else if (result === "switched") {
-      updateVoteCounts(postId, type, 1);
-      updateVoteCounts(postId, type === "upvote" ? "downvote" : "upvote", -1);
-      updateUserVote(postId, type);
-    }
   };
 
   const onConfirmDelete = () => {
@@ -299,20 +246,20 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
 
   const onEditSubquiver = () => {
     handleEditSubquiver(
-      subquiverId, // Pass the correct subquiverId
-      "Updated Name", // Provide a valid string value for newName
-      "Updated Description", // Provide a valid string value for newDescription
-      (options) => toast({ ...options, status: options.status as "info" | "warning" | "success" | "error" | "loading" }), // Explicitly type options
-      fetchPosts, // Add the missing argument (fetchPosts function)
+      subquiverId,
+      "Updated Name", 
+      "Updated Description",
+      (options) => toast({ ...options, status: options.status as "info" | "warning" | "success" | "error" | "loading" }), 
+      fetchPosts,
       router
     );
   }; 
 
   const onDeleteSubquiver = () => {
     handleDeleteSubquiver(
-      subquiverId, // Pass the correct subquiverId
-      (options) => toast({ ...options, status: options.status as "info" | "warning" | "success" | "error" | "loading" }), // Explicitly type options
-      router // Pass the router object to handle redirection
+      subquiverId,
+      (options) => toast({ ...options, status: options.status as "info" | "warning" | "success" | "error" | "loading" }),
+      router
     );
   };
 
@@ -333,26 +280,16 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
       checkMembership={checkMembership}
       updateVoteCounts={updateVoteCounts}
       updateUserVote={updateUserVote}
-      user={user}
+      user={user ? { uid: user.uid } : null}
       onEditSubquiver={onEditSubquiver}
       onDeleteSubquiver={onDeleteSubquiver} 
-      description={"Community Description"}
-      authorProfilePic={user?.photoURL || null} // Provide the author's profile picture
-      communityId={subquiverId} // Provide the community ID
+      description={description}
+      bannerImageURL={bannerImageURL}
+      iconImageURL={iconImageURL}
+      authorProfilePic={user?.photoURL || null}
+      communityId={subquiverId}
     />
   );
   
-
-  interface PostCardProps {
-    post: Post;
-    handleVote: (postId: string, type: "upvote" | "downvote") => void;
-    setDeleteModal: (modalState: { open: boolean; postId: string | null }) => void;
-    user: { uid: string | null } | null;
-  }
-  
 }
 export default CommunityContent;
-
-function newName(): Promise<void> {
-  throw new Error("Function not implemented.");
-}

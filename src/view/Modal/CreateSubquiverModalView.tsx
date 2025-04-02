@@ -25,34 +25,50 @@ import { auth, firestore } from "@/model/firebase/clientApp";
 import { FaImage } from "react-icons/fa6";
 
 interface CreateSubquiverModalViewProps {
-    isOpen: boolean;
-    onClose: () => void;
-    step: number;
-    setStep: React.Dispatch<React.SetStateAction<number>>;
-    communityName: string;
-    setCommunityName: React.Dispatch<React.SetStateAction<string>>;
-    description: string;
-    setDescription: React.Dispatch<React.SetStateAction<string>>;
-    nameError: string;
-    setNameError: React.Dispatch<React.SetStateAction<string>>;
-    descError: string;
-    setDescError: React.Dispatch<React.SetStateAction<string>>;
-    handleNext: () => void;
-    handleBack: () => void;
-    handleCreateSubquiver: () => void;
-  }
+  isOpen: boolean;
+  onClose: () => void;
+  step: number;
+  setStep: React.Dispatch<React.SetStateAction<number>>;
+  communityName: string;
+  setCommunityName: React.Dispatch<React.SetStateAction<string>>;
+  description: string;
+  setDescription: React.Dispatch<React.SetStateAction<string>>;
+  nameError: string;
+  setNameError: React.Dispatch<React.SetStateAction<string>>;
+  descError: string;
+  setDescError: React.Dispatch<React.SetStateAction<string>>;
+  handleNext: () => void;
+  handleBack: () => void;
+  handleCreateSubquiver: () => void;
+  bannerFile: File | null;
+  setBannerFile: React.Dispatch<React.SetStateAction<File | null>>;
+  iconFile: File | null;
+  setIconFile: React.Dispatch<React.SetStateAction<File | null>>;
+}
+
   
 
 const CreateSubquiverModalView: React.FC<CreateSubquiverModalViewProps> = ({
-    isOpen,
-    onClose,
+      isOpen,
+      onClose,
+      step,
+      setStep,
+      communityName,
+      setCommunityName,
+      description,
+      setDescription,
+      nameError,
+      setNameError,
+      descError,
+      setDescError,
+      handleNext,
+      handleBack,
+      handleCreateSubquiver,
+      bannerFile,
+      setBannerFile,
+      iconFile,
+      setIconFile,
   }) => {
-    const [step, setStep] = useState(1);
-    const [communityName, setCommunityName] = useState("");
-    const [description, setDescription] = useState("");
-    const [nameError, setNameError] = useState("");
-    const [descError, setDescError] = useState("");
-    const toast = useToast();
   
     useEffect(() => {
       if (!isOpen) {
@@ -63,57 +79,6 @@ const CreateSubquiverModalView: React.FC<CreateSubquiverModalViewProps> = ({
         setDescError("");
       }
     }, [isOpen]);
-  
-    const handleNext = () => {
-      setNameError("");
-      setDescError("");
-  
-      if (step === 1) {
-        if (communityName.trim().length < 3) {
-          setNameError("Community name must be at least 3 characters.");
-          return;
-        }
-        if (description.trim().length < 5) {
-          setDescError("Description must be at least 5 characters.");
-          return;
-        }
-      }
-      setStep((prev) => prev + 1);
-    };
-
-    const handleBack = () => setStep((prev) => prev - 1);
-
-    const handleCreateSubquiver = async () => {
-      try {
-        await addDoc(collection(firestore, "subquivers"), {
-          name: communityName,
-          description,
-          createdAt: serverTimestamp(),
-          creatorId: auth.currentUser?.uid,
-          bannerImageURL: "",
-          iconImageURL: "",
-          memberCount: 1,
-        });
-  
-        toast({
-          title: "Subquiver created!",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-  
-        onClose();
-      } catch (error: any) {
-        toast({
-          title: "Error creating subquiver.",
-          description: error.message,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    };
-  
 
 return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
@@ -188,16 +153,51 @@ return (
             </ModalHeader>
             <ModalBody>
               <VStack align="stretch" spacing={4}>
-                <HStack>
-                  <Text>Banner</Text>
-                  <IconButton aria-label="Add Banner" icon={<FaImage />} />
-                </HStack>
+              <HStack>
+                <Text>Banner</Text>
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="banner-upload"
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) setBannerFile(e.target.files[0]);
+                  }}
+                />
+                <IconButton
+                  aria-label="Upload Banner"
+                  icon={<FaImage />}
+                  onClick={() => document.getElementById("banner-upload")?.click()}
+                />
+                {bannerFile && (
+                  <Text fontSize="xs" color="gray.600">
+                    {bannerFile.name}
+                  </Text>
+                )}
+              </HStack>
 
-                <HStack>
-                  <Text>Icon</Text>
-                  <IconButton aria-label="Add Icon" icon={<FaImage />} />
-                </HStack>
-
+              <HStack>
+                <Text>Icon</Text>
+                <input
+                  type="file"
+                  accept="image/*"
+                  id="icon-upload"
+                  style={{ display: "none" }}
+                  onChange={(e) => {
+                    if (e.target.files?.[0]) setIconFile(e.target.files[0]);
+                  }}
+                />
+                <IconButton
+                  aria-label="Upload Icon"
+                  icon={<FaImage />}
+                  onClick={() => document.getElementById("icon-upload")?.click()}
+                />
+                {iconFile && (
+                  <Text fontSize="xs" color="gray.600">
+                    {iconFile.name}
+                  </Text>
+                )}
+              </HStack>
                 <Box border="1px solid" borderColor="gray.300" borderRadius="md" p={3}>
                   <Text fontSize="sm" fontWeight="bold">
                     q/{communityName || "your-subquiver-name"}
