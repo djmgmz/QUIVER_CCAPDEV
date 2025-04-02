@@ -221,7 +221,7 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
               src={iconImageURL || "/images/guestprofilepic.jpeg"}
               sx={{
                 border: "4px solid",
-                borderColor: "white",
+                borderColor: "brand.100",
               }}
             />
           </Box>
