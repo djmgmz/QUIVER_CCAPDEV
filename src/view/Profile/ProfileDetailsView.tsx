@@ -219,7 +219,12 @@ interface ProfileDetailsViewProps {
                       >
                         {post.downvotes}
                       </Button>
-                      <Button variant="outline" size="sm" leftIcon={<FaRegComment />}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        leftIcon={<FaRegComment />}
+                        onClick={() => router.push(`/post/${post.id}`)}
+                      >
                         {post.comments}
                       </Button>
                     </HStack>

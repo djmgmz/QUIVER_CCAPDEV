@@ -222,6 +222,11 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
   
             const createdAtDate = postData.createdAt?.toDate();
             const formattedCreatedAt = createdAtDate ? createdAtDate.toLocaleString() : "Unknown Date";
+
+            const commentsSnapshot = await getDocs(
+              collection(firestore, `subquivers/${subquiverId}/posts/${docItem.id}/comments`)
+            );
+            
   
             return {
               id: docItem.id,
@@ -229,7 +234,7 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
               description: postData.description,
               upvotes,
               downvotes,
-              comments: postData.comments || 0,
+              comments: commentsSnapshot.size,
               community: communityName,
               subquiverId,
               postAuthorUsername,
@@ -348,7 +353,6 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
     fetchUserVotes();
   }, [user.uid]);
   
-  // Function to fetch votes based on type
   const fetchVotesByType = async (voteType: "upvote" | "downvote") => {
     const votesQuery = query(
       collectionGroup(firestore, "votes"),
@@ -359,7 +363,7 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
   
     const results = await Promise.all(
       voteSnapshots.docs
-        .filter((voteDoc) => voteDoc.id === currentUser?.uid) // ✅ Filter by document ID (userId)
+        .filter((voteDoc) => voteDoc.id === currentUser?.uid)
         .map(async (voteDoc) => {
           const votePath = voteDoc.ref.path;
           const parts = votePath.split("/");
@@ -368,7 +372,6 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
           let type = "";
   
           if (parts.includes("comments")) {
-            // It's a comment vote
             type = "comment";
             const subquiverId = parts[1];
             const postId = parts[3];
@@ -418,7 +421,6 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
               createdAt,
             };
           } else {
-            // It's a post vote
             type = "post";
             const subquiverId = parts[1];
             const postId = parts[3];
@@ -460,7 +462,6 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
     return results;
   };    
   
-  // Refreshes the upvoted and downvoted items
   const refreshUserVotes = async () => {
     try {
       const upvotedData = await fetchVotesByType("upvote");
