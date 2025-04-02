@@ -26,6 +26,7 @@ interface CreatePostProps {
   onCancel: () => void;
   onCreate: () => void;
   community: string;
+  // error on file: \pages\subquiver\[community]\createpost.tsx missing author error
 }
 
 const CreatePost: React.FC<CreatePostProps> = ({
