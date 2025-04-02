@@ -30,9 +30,6 @@ import EditSubquiverModalView from "@/view/Modal/EditSubquiverModalView";
 import DeleteSubquiverModalView from "@/view/Modal/DeleteSubquiverModalView"; 
 import { BsThreeDots, BsThreeDotsVertical } from "react-icons/bs";
 
-const user = auth.currentUser;
-
-
 interface Post {
   id: string;
   title: string;
@@ -170,6 +167,7 @@ interface CommunityContentViewProps {
   description: string;
   bannerImageURL?: string | null;
   iconImageURL?: string | null;
+  creatorId: string | null;
 }
 
 const CommunityContentView: React.FC<CommunityContentViewProps> = ({
@@ -188,10 +186,12 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
   checkMembership,
   updateVoteCounts,
   updateUserVote,
+  user,
   communityId,
   description,
   bannerImageURL,
   iconImageURL,
+  creatorId,
 }) => {
 
   const [isEditModalOpen, setEditModalOpen] = useState(false);
@@ -239,14 +239,17 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
             </Box>
 
             <HStack spacing={3}>
+            
+            {user?.uid === creatorId && (
+              <Menu>
+                <MenuButton as={IconButton} icon={<BsThreeDotsVertical />} variant="outline" />
+                <MenuList>
+                  <MenuItem onClick={() => setEditModalOpen(true)}>Edit Subquiver</MenuItem>
+                  <MenuItem onClick={() => setDeleteModalOpen(true)}>Delete Subquiver</MenuItem>
+                </MenuList>
+              </Menu>
+            )}
 
-          <Menu>
-            <MenuButton as={IconButton} icon={<BsThreeDotsVertical />} variant="outline" />
-              <MenuList>
-                <MenuItem onClick={() => setEditModalOpen(true)}>Edit Subquiver</MenuItem>
-                <MenuItem onClick={() => setDeleteModalOpen(true)}>Delete Subquiver</MenuItem>
-              </MenuList>
-          </Menu>
 
           <Button leftIcon={<FaPlus />} size="md" variant="outline" onClick={handleCreatePost}>
             Create Post

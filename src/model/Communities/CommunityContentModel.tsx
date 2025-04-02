@@ -78,6 +78,7 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
   const [iconImageURL, setIconImageURL] = useState<string | null>(null);
   const [description, setDescription] = useState<string>("Community Description");
   const [user, loadingUser] = useAuthState(auth);
+  const [creatorId, setCreatorId] = useState<string | null>(null);
   const router = useRouter();
   const toast = useToast();
 
@@ -157,14 +158,17 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
         const subquiverDoc = await getDoc(doc(firestore, "subquivers", subquiverId));
         if (subquiverDoc.exists()) {
           const data = subquiverDoc.data();
+          console.log("Current User UID:", user?.uid);
+          console.log("Creator ID from Firestore:", data.creatorId);
           setBannerImageURL(data.bannerImageURL || null);
           setIconImageURL(data.iconImageURL || null);
           setDescription(data.description || "No description available");
+          setCreatorId(data.creatorId || null);
         }
       } catch (error) {
         console.error("Error fetching subquiver metadata:", error);
       }
-    };
+    };    
   
     if (subquiverId) {
       fetchSubquiverMetadata();
@@ -282,12 +286,13 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
       updateUserVote={updateUserVote}
       user={user ? { uid: user.uid } : null}
       onEditSubquiver={onEditSubquiver}
-      onDeleteSubquiver={onDeleteSubquiver} 
+      onDeleteSubquiver={onDeleteSubquiver}
       description={description}
       bannerImageURL={bannerImageURL}
       iconImageURL={iconImageURL}
       authorProfilePic={user?.photoURL || null}
       communityId={subquiverId}
+      creatorId={creatorId}
     />
   );
   
