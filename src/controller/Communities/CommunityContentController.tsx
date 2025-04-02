@@ -3,6 +3,7 @@ import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, deleteDoc, getDocs, se
 import router, { NextRouter } from "next/router";
 import { useToast } from "@chakra-ui/react";
 import useCommunities from "@/model/hooks/useCommunities"; // Import the correct hook
+import { getStorage, deleteObject, ref } from "firebase/storage";
 
 export const handleJoin = async (user: any, subquiverId: string) => {
   if (!user) throw new Error("User not authenticated");
@@ -119,12 +120,37 @@ export const handleEditSubquiver = async (
 };
 
 export const handleDeleteSubquiver = async (
-  subquiverId: string, 
+  subquiverId: string,
   toast: (options: { title: string; status: string; duration: number; isClosable: boolean }) => void,
-  router: NextRouter // Add router as a parameter here
+  router: NextRouter
 ) => {
   try {
-    // Delete all posts within the community
+    const subquiverRef = doc(firestore, "subquivers", subquiverId);
+    const subquiverSnap = await getDoc(subquiverRef);
+
+    const storage = getStorage();
+
+    if (subquiverSnap.exists()) {
+      const data = subquiverSnap.data();
+      const bannerURL = data.bannerImageURL;
+      const iconURL = data.iconImageURL;
+
+      const getPathFromUrl = (url: string) => {
+        const match = decodeURIComponent(url).match(/\/o\/(.*?)\?alt=media/);
+        return match ? match[1] : null;
+      };
+
+      const bannerPath = bannerURL ? getPathFromUrl(bannerURL) : null;
+      const iconPath = iconURL ? getPathFromUrl(iconURL) : null;
+
+      if (bannerPath) {
+        await deleteObject(ref(storage, bannerPath));
+      }
+      if (iconPath) {
+        await deleteObject(ref(storage, iconPath));
+      }
+    }
+
     const postsQuery = collection(firestore, "subquivers", subquiverId, "posts");
     const postsSnapshot = await getDocs(postsQuery);
     const batch = writeBatch(firestore);
@@ -135,9 +161,8 @@ export const handleDeleteSubquiver = async (
 
     await batch.commit();
 
-    // Now delete the community
-    await deleteDoc(doc(firestore, "subquivers", subquiverId));
-    
+    await deleteDoc(subquiverRef);
+
     toast({
       title: "Community deleted successfully!",
       status: "success",
@@ -145,12 +170,8 @@ export const handleDeleteSubquiver = async (
       isClosable: true,
     });
 
-   // Reload the page first, then navigate to home after a short delay
     router.reload();
-    setTimeout(() => {
-      router.replace("/"); // Ensure smooth transition back to home
-    }, 100);
-    
+    setTimeout(() => router.replace("/"), 100);
   } catch (error) {
     console.error("Error deleting community:", error);
     toast({
@@ -161,6 +182,7 @@ export const handleDeleteSubquiver = async (
     });
   }
 };
+
 
 function fetchPosts() {
   throw new Error("Function not implemented.");
