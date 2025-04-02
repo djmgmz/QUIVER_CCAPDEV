@@ -206,8 +206,8 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
     setDeleteModal({ open: false, postId: null });
   };
   
-  const onJoin = () => {
-    join(user, subquiverId);
+  const onJoin = async () => {
+    await join(user, subquiverId);
     setJoined(true);
     toast({
       title: "Joined Community!",
@@ -215,10 +215,11 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
       duration: 3000,
       isClosable: true,
     });
+    router.reload();
   };
   
-  const onLeave = () => {
-    leave(user, subquiverId);
+  const onLeave = async () => {
+    await leave(user, subquiverId);
     setJoined(false);
     toast({
       title: "Left Community!",
@@ -226,7 +227,9 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
       duration: 3000,
       isClosable: true,
     });
+    router.reload();
   };
+  
 
   const onCreatePost = () => {
     create(user, name, router);

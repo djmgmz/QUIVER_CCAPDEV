@@ -2,15 +2,37 @@ import { VStack, Box, Button, Text, Icon, HStack, Collapse, Spinner } from "@cha
 import { IoHome } from "react-icons/io5";
 import { FaBinoculars } from "react-icons/fa6";
 import { TiArrowSortedDown } from "react-icons/ti";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import DlsuStarIcon from "../Icons/DlsuStarIcon";
 import useCommunities from "@/model/hooks/useCommunities";
+import { auth, firestore } from "@/model/firebase/clientApp";
+import { getDoc, doc } from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 const Sidebar = () => {
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
   const { communities, loading } = useCommunities();
+  const [user] = useAuthState(auth);
+  const [joinedCommunityIds, setJoinedCommunityIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchJoinedCommunities = async () => {
+      if (!user) return;
+      const userDoc = await getDoc(doc(firestore, "users", user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setJoinedCommunityIds(userData.joinedCommunities || []);
+      }
+    };
+
+    fetchJoinedCommunities();
+  }, [user]);
+
+  const filteredCommunities = communities.filter((c) =>
+    joinedCommunityIds.includes(c.id)
+  );
 
   const handleHomeClick = () => {
     router.push("/");
@@ -87,22 +109,22 @@ const Sidebar = () => {
       </HStack>
 
       <Collapse in={showDropdown}>
-        {loading ? (
-          <Spinner color="brand.100" />
-        ) : (
-          <VStack align="stretch" mt={2} pl={2} spacing={0.3}>
-            {communities.map((community) => (
-              <Button
-                key={community.id}
-                variant="ghost"
-                justifyContent="flex-start"
-                onClick={() => router.push(`/subquiver/${community.name}`)}
-              >
-                <Text color="brand.600">q/{community.name}</Text>
-              </Button>
-            ))}
-          </VStack>
-        )}
+      {loading ? (
+        <Spinner color="brand.100" />
+      ) : (
+        <VStack align="stretch" mt={2} pl={2} spacing={0.3}>
+          {filteredCommunities.map((community) => (
+            <Button
+              key={community.id}
+              variant="ghost"
+              justifyContent="flex-start"
+              onClick={() => router.push(`/subquiver/${community.name}`)}
+            >
+              <Text color="brand.600">q/{community.name}</Text>
+            </Button>
+          ))}
+        </VStack>
+      )}
       </Collapse>
     </Box>
   );
