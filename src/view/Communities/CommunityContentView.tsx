@@ -320,7 +320,12 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
             }}
           />
     
-          <DeletePost isOpen={deleteModal.open} onClose={() => setDeleteModal({ open: false, postId: null })} onDelete={handleConfirmDelete} />
+    <DeletePost
+        isOpen={deleteModal.open}
+        onClose={() => setDeleteModal({ open: false, postId: null })}
+        onDelete={handleConfirmDelete}
+        type="post"
+      />
         </Box>
     );
 };
