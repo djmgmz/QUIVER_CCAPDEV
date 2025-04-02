@@ -229,9 +229,14 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
           
           <Box ml={100} px={4} pt={2} pb={4}>
             <HStack justify="space-between" align="center">
+            <Box>
               <Text color="brand.100" fontSize="35" fontWeight="bold">
-          q/{name}
+                q/{name}
               </Text>
+              <Text fontSize="lg" color="gray.600" maxW="600px" ml={10} mt={2}>
+                {description}
+              </Text>
+            </Box>
 
             <HStack spacing={3}>
 
