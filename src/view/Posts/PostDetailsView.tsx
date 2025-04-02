@@ -505,12 +505,14 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
         isOpen={isDeleteModalOpen} 
         onClose={() => setIsDeleteModalOpen(false)} 
         onDelete={handleDeletePost} 
+        type="post"
       />
 
       <DeletePost 
         isOpen={commentToDelete !== null} 
         onClose={() => setCommentToDelete(null)} 
         onDelete={() => commentToDelete && handleDeleteComment(commentToDelete)} 
+        type="comment"
       />
     </VStack>
   );
