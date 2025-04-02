@@ -9,10 +9,12 @@ import {
     serverTimestamp,
     setDoc,
     addDoc,
+    onSnapshot
   } from "firebase/firestore";
   import { firestore } from "@/model/firebase/clientApp";
-  import { NextRouter } from "next/router";
+  import router, { NextRouter } from "next/router";
   import { UseToastOptions } from "@chakra-ui/react";
+  
   
   export const handleDeletePost = async (
     post: any,
@@ -112,13 +114,16 @@ import {
     setComments((prev) => [...prev, { id: docRef.id, ...newComment, replies: [] }]);
     setCommentText("");
     setIsCommenting(false);
-  
+    
+    router.reload();
+    
     toast({
       title: "Comment added successfully!",
       status: "success",
       duration: 3000,
       isClosable: true,
     });
+
   };
   
   export const handleVote = async (
@@ -202,5 +207,7 @@ import {
       duration: 3000,
       isClosable: true,
     });
+
+    router.reload();
   };
   
