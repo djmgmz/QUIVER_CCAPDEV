@@ -19,6 +19,7 @@ type UserMenuProps = {
 const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
   const router = useRouter();
   const { toggleTheme } = useTheme();
+  const [themeLabel, setThemeLabel] = useState("Dark Mode");
   const toast = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
@@ -37,6 +38,17 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
     fetchProfilePicture();
   }, [user?.uid]);
 
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    setThemeLabel(savedTheme === "alternate" ? "Light Mode" : "Dark Mode");
+  }, []);
+
+
+  const handleToggleTheme = () => {
+    toggleTheme();
+    setThemeLabel((prev) => (prev === "Dark Mode" ? "Light Mode" : "Dark Mode"));
+  };
+
   const handleViewProfile = () => viewProfile(router, user?.uid, setIsOpen);
   const handleEditProfile = () => editProfile(router, setIsOpen);
   const handleSignOut = () => signOutHandler(router, toast, setIsOpen, setProfilePicture);
@@ -50,7 +62,8 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
       handleViewProfile={handleViewProfile}
       handleEditProfile={handleEditProfile}
       handleSignOut={handleSignOut}
-      toggleTheme={toggleTheme}
+      toggleTheme={handleToggleTheme}
+      themeLabel={themeLabel}
     />
   );
 };

@@ -21,6 +21,7 @@ import {
     handleEditProfile: () => void;
     handleSignOut: () => void;
     toggleTheme: () => void;
+    themeLabel: string;
   };  
   
   const UserMenuView: React.FC<UserMenuViewProps> = ({
@@ -32,6 +33,7 @@ import {
     handleEditProfile,
     handleSignOut,
     toggleTheme,
+    themeLabel,
   }) => {
     return (
       <Menu isOpen={isOpen} onClose={() => setIsOpen(false)}>
@@ -73,7 +75,7 @@ import {
                 Edit Profile
               </MenuItem>
               <MenuItem _hover={{ bg: 'brand.100', color: 'brand.200' }} onClick={toggleTheme}>
-                Dark Mode
+                {themeLabel}
               </MenuItem>
               <MenuItem _hover={{ bg: 'brand.100', color: 'brand.200' }} onClick={handleSignOut}>
                 Sign Out
@@ -81,7 +83,7 @@ import {
             </>
           ) : (
             <MenuItem _hover={{ bg: 'brand.100', color: 'brand.200' }} onClick={toggleTheme}>
-              Dark Mode
+              {themeLabel}
             </MenuItem>
           )}
         </MenuList>
