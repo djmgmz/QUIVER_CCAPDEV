@@ -23,6 +23,7 @@ export const handleEditProfile = (
 };
 
 export const handleSignOut = async (
+  router: NextRouter,
   toast: (options: UseToastOptions) => void,
   setIsOpen: (open: boolean) => void,
   setProfilePicture: React.Dispatch<React.SetStateAction<string | null>>
@@ -42,5 +43,6 @@ export const handleSignOut = async (
   });
 
   setIsOpen(false);
+  router.push("/");
 };
 

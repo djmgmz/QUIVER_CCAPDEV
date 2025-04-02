@@ -39,7 +39,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ user }) => {
 
   const handleViewProfile = () => viewProfile(router, user?.uid, setIsOpen);
   const handleEditProfile = () => editProfile(router, setIsOpen);
-  const handleSignOut = () => signOutHandler(toast, setIsOpen, setProfilePicture);
+  const handleSignOut = () => signOutHandler(router, toast, setIsOpen, setProfilePicture);
 
   return (
     <UserMenuView
