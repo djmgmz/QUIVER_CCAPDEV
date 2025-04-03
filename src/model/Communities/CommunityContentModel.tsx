@@ -34,6 +34,7 @@ import {
   arrayUnion,
   arrayRemove,
   setDoc,
+  where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { BiDownvote, BiSolidDownvote, BiSolidUpvote, BiUpvote } from "react-icons/bi";
@@ -79,6 +80,8 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
   const [description, setDescription] = useState<string>("Community Description");
   const [user, loadingUser] = useAuthState(auth);
   const [creatorId, setCreatorId] = useState<string | null>(null);
+  const [bannerURL, setBannerURL] = useState<string | null>(null);
+  const [iconURL, setIconURL] = useState<string | null>(null);
   const router = useRouter();
   const toast = useToast();
 
@@ -269,7 +272,7 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
       router
     );
   };
-
+  
   return (
     <CommunityContentView
       name={name}

@@ -20,6 +20,8 @@ interface CreatePostViewProps {
   handleCreatePost: () => void;
   community: string;
   username: string | null;
+  bannerImageURL?: string | null;
+  iconImageURL?: string | null;
 }
 
 const CreatePostView: React.FC<CreatePostViewProps> = ({
@@ -31,18 +33,34 @@ const CreatePostView: React.FC<CreatePostViewProps> = ({
   handleCreatePost,
   community,
   username,
+  bannerImageURL,
+  iconImageURL
 }) => {
   return (
     <Box width="full">
-      <Box width="full" height="150px" bg="brand.100" position="relative">
+      <Box
+        width="full"
+        height="150px"
+        position="relative"
+        sx={{
+          bg: bannerImageURL ? "transparent" : "brand.100",
+          backgroundImage: bannerImageURL ? `url(${bannerImageURL})` : undefined,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
         <Avatar
           size="xl"
           position="absolute"
           bottom="-40px"
           left="20px"
-          border="4px solid"
-          borderColor="white"
-          bg="brand.100"
+          bg="gray.400"
+          src={iconImageURL || "/images/guestprofilepic.jpeg"}
+          sx={{
+            border: "4px solid",
+            borderColor: "brand.100",
+          }}
         />
       </Box>
 

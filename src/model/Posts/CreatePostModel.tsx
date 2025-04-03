@@ -1,20 +1,16 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Box,
-  Text,
-  Input,
-  Textarea,
-  Button,
-  VStack,
-  HStack,
-  Avatar,
-  Flex,
   useToast,
 } from "@chakra-ui/react";
-import { addDoc, collection, serverTimestamp, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import { firestore, auth } from "@/model/firebase/clientApp";
 import { useRouter } from "next/router";
-import useUsername from "@/model/hooks/useUsername"; // Import the hook
+import useUsername from "@/model/hooks/useUsername";
 import CreatePostView from "@/view/Posts/CreatePostView";
 import { handleCreatePost as createPost } from "@/controller/Posts/CreatePostController";
 
@@ -26,7 +22,6 @@ interface CreatePostProps {
   onCancel: () => void;
   onCreate: () => void;
   community: string;
-  // error on file: \pages\subquiver\[community]\createpost.tsx missing author error
 }
 
 const CreatePost: React.FC<CreatePostProps> = ({
@@ -43,6 +38,27 @@ const CreatePost: React.FC<CreatePostProps> = ({
   const currentUser = auth.currentUser;
   const username = useUsername(currentUser?.uid ?? null);
 
+  const [bannerURL, setBannerURL] = useState<string | null>(null);
+  const [iconURL, setIconURL] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSubquiverImages = async () => {
+      const subquiverQuery = query(
+        collection(firestore, "subquivers"),
+        where("name", "==", community)
+      );
+      const querySnapshot = await getDocs(subquiverQuery);
+  
+      if (!querySnapshot.empty) {
+        const data = querySnapshot.docs[0].data();
+        setBannerURL(data.bannerImageURL || null);
+        setIconURL(data.iconImageURL || null);
+      }
+    };
+
+    fetchSubquiverImages();
+  }, [community]);
+
   const handleCreatePost = () =>
     createPost(currentUser, title, description, username || "anonymous", community, router, toast);
 
@@ -56,9 +72,10 @@ const CreatePost: React.FC<CreatePostProps> = ({
       handleCreatePost={handleCreatePost}
       community={community}
       username={username}
+      bannerImageURL={bannerURL}
+      iconImageURL={iconURL}
     />
   );
-  
 };
 
 export default CreatePost;
