@@ -61,7 +61,7 @@ const Sidebar = () => {
         <Button
           onClick={handleHomeClick}
           leftIcon={<Icon as={IoHome} boxSize={6} color="brand.100" />}
-          variant="ghost"
+          variant="sidebar"
           justifyContent="flex-start"
         >
           <Text ml={2.2} color="brand.100">Home</Text>
@@ -70,7 +70,7 @@ const Sidebar = () => {
         <Button
           onClick={handlePopularClick}
           leftIcon={<DlsuStarIcon />}
-          variant="ghost"
+          variant="sidebar"
           justifyContent="flex-start"
         >
           <Text ml={2.2} color="brand.100">Popular</Text>
@@ -79,7 +79,7 @@ const Sidebar = () => {
         <Button
           onClick={handleRecentClick}
           leftIcon={<Icon as={FaBinoculars} boxSize={6} color="brand.100" />}
-          variant="ghost"
+          variant="sidebar"
           justifyContent="flex-start"
         >
           <Text ml={2.2} color="brand.100">Recent</Text>
@@ -116,7 +116,7 @@ const Sidebar = () => {
           {filteredCommunities.map((community) => (
             <Button
               key={community.id}
-              variant="ghost"
+              variant="sidebar"
               justifyContent="flex-start"
               onClick={() => router.push(`/subquiver/${community.name}`)}
             >

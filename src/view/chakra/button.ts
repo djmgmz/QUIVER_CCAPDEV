@@ -41,5 +41,11 @@ export const Button: ComponentStyleConfig = {
                 bg: "gray.50"
             },
         },
+        sidebar: {
+            color: "brand.800",
+            _hover: {
+                bg: "brand.700",
+            },
+        }
     },
 };
