@@ -104,7 +104,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, handleVote, setDeleteModal, u
         </HStack>
   
         <Box mx={7} mt={3} p={6} bg="brand.800" borderRadius="md">
-          <Text color="#F4F4F4">{post.description}</Text>
+          <Text color="#55828B">{post.description}</Text>
         </Box>
   
         <Box mt={2} ml={5}>
@@ -233,7 +233,7 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
               <Text color="brand.100" fontSize="35" fontWeight="bold">
                 q/{name}
               </Text>
-              <Text fontSize="lg" color="gray.600" maxW="600px" ml={10} mt={2}>
+              <Text fontSize="lg" color="brand.600" maxW="600px" ml={10} mt={2}>
                 {description}
               </Text>
             </Box>
