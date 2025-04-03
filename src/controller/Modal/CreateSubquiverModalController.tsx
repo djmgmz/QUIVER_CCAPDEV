@@ -99,7 +99,7 @@ export const handleCreateSubquiver = async (
 
     toast({
       title: "Subquiver created & joined!",
-      description: "You have automatically joined this community.",
+      description: "You have automatically joined this community and you're the owner.",
       status: "success",
       duration: 3000,
       isClosable: true,
