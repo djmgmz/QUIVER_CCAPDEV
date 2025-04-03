@@ -67,10 +67,10 @@ const LoginView:React.FC<LoginProps> = () => {
                     isChecked={loginForm.rememberMe}
                     iconColor="white"
                     borderColor="brand.100"
-                    color="brand.100"
+                    color="brand.800"
                     sx={{
                         ".chakra-checkbox__control": {
-                        borderColor: "brand.100",
+                        borderColor: "brand.800",
                         _checked: {
                             bg: "brand.100",
                             borderColor: "brand.100",

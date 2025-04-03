@@ -88,19 +88,19 @@ const PostDetails: React.FC<PostDetailsProps> = ({ post, comments: initialCommen
   const router = useRouter();
 
   const handlePostUpvote = () => {
-    handleVote(post, currentUser, "upvote", "post", null, fetchPostVotes, refreshCommentVotes, setUpvoted, setDownvoted);
+    handleVote(post, currentUser, "upvote", "post", null, fetchPostVotes, refreshCommentVotes, setUpvoted, setDownvoted, toast);
   };
   
   const handlePostDownvote = () => {
-    handleVote(post, currentUser, "downvote", "post", null, fetchPostVotes, refreshCommentVotes, setUpvoted, setDownvoted);
+    handleVote(post, currentUser, "downvote", "post", null, fetchPostVotes, refreshCommentVotes, setUpvoted, setDownvoted, toast);
   };
   
   const handleCommentUpvote = (commentId: string) => {
-    handleVote(post, currentUser, "upvote", "comment", commentId, fetchPostVotes, refreshCommentVotes, setUpvoted, setDownvoted);
+    handleVote(post, currentUser, "upvote", "comment", commentId, fetchPostVotes, refreshCommentVotes, setUpvoted, setDownvoted, toast);
   };
   
   const handleCommentDownvote = (commentId: string) => {
-    handleVote(post, currentUser, "downvote", "comment", commentId, fetchPostVotes, refreshCommentVotes, setUpvoted, setDownvoted);
+    handleVote(post, currentUser, "downvote", "comment", commentId, fetchPostVotes, refreshCommentVotes, setUpvoted, setDownvoted, toast);
   };
   
   const onDeletePost = () => {

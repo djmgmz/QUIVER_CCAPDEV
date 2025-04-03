@@ -14,7 +14,7 @@ import {
   import { firestore } from "@/model/firebase/clientApp";
   import router, { NextRouter } from "next/router";
   import { UseToastOptions } from "@chakra-ui/react";
-  
+  import { auth } from '@/model/firebase/clientApp';
   
   export const handleDeletePost = async (
     post: any,
@@ -96,34 +96,46 @@ import {
     setIsCommenting: (val: boolean) => void,
     toast: (options: UseToastOptions) => void
   ) => {
-    if (commentText.trim() === "") return;
-  
-    const commentsRef = collection(firestore, "subquivers", post.community, "posts", post.id, "comments");
-  
-    const newComment = {
-      content: commentText,
-      author: currentUser?.uid || "unknown",
-      username: currentUser?.displayName?.length >= 3 ? currentUser.displayName : "Anonymous",
-      createdAt: serverTimestamp(),
-      edited: false,
-      parentId: null,
-    };    
-  
-    const docRef = await addDoc(commentsRef, newComment);
-  
-    setComments((prev) => [...prev, { id: docRef.id, ...newComment, replies: [] }]);
-    setCommentText("");
-    setIsCommenting(false);
-    
-    router.reload();
-    
-    toast({
-      title: "Comment added successfully!",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
 
+    if (!currentUser) {
+      toast({
+        title: "You must be logged in to interact with posts.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    else{   
+      if (commentText.trim() === "") return;
+    
+      const commentsRef = collection(firestore, "subquivers", post.community, "posts", post.id, "comments");
+    
+      const newComment = {
+        content: commentText,
+        author: currentUser?.uid || "unknown",
+        username: currentUser?.displayName?.length >= 3 ? currentUser.displayName : "Anonymous",
+        createdAt: serverTimestamp(),
+        edited: false,
+        parentId: null,
+      };    
+    
+      const docRef = await addDoc(commentsRef, newComment);
+    
+
+      setComments((prev) => [...prev, { id: docRef.id, ...newComment, replies: [] }]);
+      setCommentText("");
+      setIsCommenting(false);
+      
+      router.reload();
+      
+      toast({
+        title: "Comment added successfully!",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+   }
   };
   
   export const handleVote = async (
@@ -135,42 +147,55 @@ import {
     fetchPostVotes: () => Promise<void>,
     refreshCommentVotes: (commentId: string) => Promise<void>,
     setUpvoted: (val: boolean) => void,
-    setDownvoted: (val: boolean) => void
+    setDownvoted: (val: boolean) => void,
+    toast: (options: UseToastOptions) => void
   ) => {
-    const votePath = commentId
-      ? `subquivers/${post.community}/posts/${post.id}/comments/${commentId}/votes/${currentUser?.uid}`
-      : `subquivers/${post.community}/posts/${post.id}/votes/${currentUser?.uid}`;
-  
-    const voteRef = doc(firestore, votePath);
-    const voteDoc = await getDoc(voteRef);
-  
-    if (voteDoc.exists()) {
-      const existingVote = voteDoc.data().type;
-  
-      if (existingVote === type) {
-        await deleteDoc(voteRef);
-        if (target === "post") {
-          type === "upvote" ? setUpvoted(false) : setDownvoted(false);
-        }
-      } else {
-        await setDoc(voteRef, { type });
-        if (target === "post") {
-          type === "upvote" ? (setUpvoted(true), setDownvoted(false)) : (setDownvoted(true), setUpvoted(false));
-        }
-      }
-    } else {
-      await setDoc(voteRef, { type });
-      if (target === "post") {
-        type === "upvote" ? setUpvoted(true) : setDownvoted(true);
-      }
+
+    if (!currentUser) {
+      toast({
+        title: "You must be logged in to interact with posts.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
     }
-  
-    if (target === "post") {
-      await fetchPostVotes();
-    } else if (commentId) {
-      await refreshCommentVotes(commentId);
+    else{
+        const votePath = commentId
+          ? `subquivers/${post.community}/posts/${post.id}/comments/${commentId}/votes/${currentUser?.uid}`
+          : `subquivers/${post.community}/posts/${post.id}/votes/${currentUser?.uid}`;
+      
+        const voteRef = doc(firestore, votePath);
+        const voteDoc = await getDoc(voteRef);
+      
+        if (voteDoc.exists()) {
+          const existingVote = voteDoc.data().type;
+      
+          if (existingVote === type) {
+            await deleteDoc(voteRef);
+            if (target === "post") {
+              type === "upvote" ? setUpvoted(false) : setDownvoted(false);
+            }
+          } else {
+            await setDoc(voteRef, { type });
+            if (target === "post") {
+              type === "upvote" ? (setUpvoted(true), setDownvoted(false)) : (setDownvoted(true), setUpvoted(false));
+            }
+          }
+        } else {
+          await setDoc(voteRef, { type });
+          if (target === "post") {
+            type === "upvote" ? setUpvoted(true) : setDownvoted(true);
+          }
+        }
+      
+        if (target === "post") {
+          await fetchPostVotes();
+        } else if (commentId) {
+          await refreshCommentVotes(commentId);
+        }
+      };
     }
-  };
 
   export const handleReplySubmit = async (
     post: any,
@@ -182,32 +207,44 @@ import {
     setIsReplying: (val: boolean) => void,
     toast: (options: UseToastOptions) => void
   ) => {
-    if (replyText.trim() === "") return;
-  
-    const commentsRef = collection(firestore, "subquivers", post.community, "posts", post.id, "comments");
-  
-    const newReply = {
-      content: replyText,
-      author: currentUser?.uid || "unknown",
-      username: currentUser?.displayName || "Anonymous",
-      createdAt: serverTimestamp(),
-      edited: false,
-      parentId,
-    };
-  
-    const docRef = await addDoc(commentsRef, newReply);
-  
-    setComments((prev) => [...prev, { id: docRef.id, ...newReply, replies: [] }]);
-    setReplyText("");
-    setIsReplying(false);
-  
-    toast({
-      title: "Reply added successfully!",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
 
-    router.reload();
-  };
-  
+    if (!currentUser) {
+      toast({
+        title: "You must be logged in to interact with posts.",
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+    
+    else{
+      if (replyText.trim() === "") return;
+    
+      const commentsRef = collection(firestore, "subquivers", post.community, "posts", post.id, "comments");
+    
+      const newReply = {
+        content: replyText,
+        author: currentUser?.uid || "unknown",
+        username: currentUser?.displayName || "Anonymous",
+        createdAt: serverTimestamp(),
+        edited: false,
+        parentId,
+      };
+    
+      const docRef = await addDoc(commentsRef, newReply);
+    
+      setComments((prev) => [...prev, { id: docRef.id, ...newReply, replies: [] }]);
+      setReplyText("");
+      setIsReplying(false);
+    
+      toast({
+        title: "Reply added successfully!",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+
+      router.reload();
+    };
+  }
