@@ -24,7 +24,7 @@ const Icons: React.FC = () => {
             py={1}
             cursor="pointer"
             borderRadius={4}
-            _hover={{ bg: "gray.200" }}
+            _hover={{ bg: "brand.400" }}
             onClick={onOpen}
           >
             <Icon color="brand.100" as={GrAdd} fontSize={20} />

@@ -440,8 +440,8 @@ interface ProfileDetailsViewProps {
             <Button
               colorScheme="red"
               onClick={() => {
-                onDelete(); // ✅ call the delete handler from props
-                onClose();  // ✅ close modal after deletion
+                onDelete(); 
+                onClose();  
               }}
             >
               Delete

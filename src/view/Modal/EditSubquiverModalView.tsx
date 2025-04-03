@@ -88,42 +88,45 @@ const EditSubquiverModal: React.FC<EditSubquiverModalProps> = ({
   const handleSaveChanges = async () => {
     let finalBannerUrl = bannerImageURL;
     let finalIconUrl = iconImageURL;
-
+  
     try {
       if (bannerFile) {
         const bannerRef = ref(storage, `subquivers/${communityId}/banner`);
         const bannerSnap = await uploadBytes(bannerRef, bannerFile);
         finalBannerUrl = await getDownloadURL(bannerSnap.ref);
       }
-
+  
       if (iconFile) {
         const iconRef = ref(storage, `subquivers/${communityId}/icon`);
         const iconSnap = await uploadBytes(iconRef, iconFile);
         finalIconUrl = await getDownloadURL(iconSnap.ref);
       }
-
-      await updateDoc(doc(firestore, "subquivers", communityId), {
+  
+      // Only include fields that have changed
+      const updateData: any = {
         name: newName,
         description: newDescription,
-        bannerImageURL: finalBannerUrl,
-        iconImageURL: finalIconUrl,
-      });
-
+      };
+  
+      if (bannerFile) updateData.bannerImageURL = finalBannerUrl;
+      if (iconFile) updateData.iconImageURL = finalIconUrl;
+  
+      await updateDoc(doc(firestore, "subquivers", communityId), updateData);
+  
       toast({
-        title: "Subquiver updated successfully!",
+        title: "Subquiver updated!",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
-
-      onEdit(communityId, newName, newDescription, finalBannerUrl, finalIconUrl);
-      onClose();
-    } catch (error: any) {
+  
+    } catch (error) {
+      console.error("Failed to update subquiver:", error);
       toast({
-        title: "Error saving changes.",
-        description: error.message,
+        title: "Update failed",
+        description: "An error occurred while saving changes.",
         status: "error",
-        duration: 4000,
+        duration: 3000,
         isClosable: true,
       });
     }

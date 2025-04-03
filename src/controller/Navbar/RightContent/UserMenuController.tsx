@@ -44,5 +44,6 @@ export const handleSignOut = async (
 
   setIsOpen(false);
   router.push("/");
+  router.reload();
 };
 

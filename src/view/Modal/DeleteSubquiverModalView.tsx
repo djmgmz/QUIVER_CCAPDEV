@@ -31,7 +31,7 @@ const DeleteSubquiverModal: React.FC<DeleteSubquiverModalProps> = ({ isOpen, onC
                     <Button variant="outline" onClick={onClose}>
                         Cancel
                     </Button>
-                    <Button colorScheme="red" ml={3} onClick={onDelete}>
+                    <Button variant="default" ml={3} onClick={onDelete}>
                         Delete
                     </Button>
                 </ModalFooter>

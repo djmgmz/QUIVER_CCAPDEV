@@ -109,22 +109,28 @@ const Sidebar = () => {
       </HStack>
 
       <Collapse in={showDropdown}>
-      {loading ? (
-        <Spinner color="brand.100" />
-      ) : (
-        <VStack align="stretch" mt={2} pl={2} spacing={0.3}>
-          {filteredCommunities.map((community) => (
-            <Button
-              key={community.id}
-              variant="sidebar"
-              justifyContent="flex-start"
-              onClick={() => router.push(`/subquiver/${community.name}`)}
-            >
-              <Text color="brand.600">q/{community.name}</Text>
-            </Button>
-          ))}
-        </VStack>
-      )}
+        {loading ? (
+          <Spinner color="brand.100" />
+        ) : filteredCommunities.length === 0 ? (
+          <Box textAlign="center">
+            <Text color="brand.100" mt={2} >
+              No subquivers? Hop in a quiver!
+            </Text>
+          </Box>
+        ) : (
+          <VStack align="stretch" mt={2} pl={2} spacing={0.3}>
+            {filteredCommunities.map((community) => (
+              <Button
+                key={community.id}
+                variant="sidebar"
+                justifyContent="flex-start"
+                onClick={() => router.push(`/subquiver/${community.name}`)}
+              >
+                <Text color="brand.600">q/{community.name}</Text>
+              </Button>
+            ))}
+          </VStack>
+        )}
       </Collapse>
     </Box>
   );
