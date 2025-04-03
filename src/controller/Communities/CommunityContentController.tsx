@@ -2,7 +2,6 @@ import { firestore } from "@/model/firebase/clientApp";
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, deleteDoc, getDocs, setDoc, collection, writeBatch } from "firebase/firestore";
 import router, { NextRouter } from "next/router";
 import { useToast } from "@chakra-ui/react";
-import useCommunities from "@/model/hooks/useCommunities"; // Import the correct hook
 import { getStorage, deleteObject, ref } from "firebase/storage";
 
 export const handleJoin = async (user: any, subquiverId: string) => {
@@ -45,6 +44,8 @@ export const handleConfirmDelete = async (subquiverId: string, postId: string) =
   }
 
   await deleteDoc(doc(firestore, "subquivers", subquiverId, "posts", postId));
+
+  router.reload();
 };
 
 export const handleVote = async (
