@@ -1,6 +1,7 @@
-import { addDoc, collection, doc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+import { addDoc, arrayUnion, collection, doc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { auth, firestore, storage } from "@/model/firebase/clientApp";
+import router from "next/router";
 
 export const handleNext = (
   step: number,
@@ -42,11 +43,29 @@ export const handleCreateSubquiver = async (
     const creatorId = auth.currentUser?.uid;
     const timestamp = serverTimestamp();
 
+    // **Step 1: Check if a subquiver with the same name already exists**
+    const subquiversRef = collection(firestore, "subquivers");
+    const q = query(subquiversRef, where("name", "==", communityName));
+    const existingSubquivers = await getDocs(q);
+
+    if (!existingSubquivers.empty) {
+      toast({
+        title: "Subquiver already exists!",
+        description: "A community with this name already exists. Choose a different name.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    // **Step 2: Check if the user is already a member of the subquiver**
+    const subquiverId = doc(subquiversRef).id;
+
     let bannerImageURL = "";
     let iconImageURL = "";
 
-    const subquiverId = doc(collection(firestore, "subquivers")).id;
-
+   // **Step 3: Upload the banner and icon images to Firebase Storage**
     if (bannerFile) {
       const bannerRef = ref(storage, `subquivers/${subquiverId}/banner`);
       const bannerSnap = await uploadBytes(bannerRef, bannerFile);
@@ -59,6 +78,7 @@ export const handleCreateSubquiver = async (
       iconImageURL = await getDownloadURL(iconSnap.ref);
     }
 
+    // **Step 4: Create the subquiver document in Firestore**
     await setDoc(doc(firestore, "subquivers", subquiverId), {
       name: communityName,
       description,
@@ -69,12 +89,23 @@ export const handleCreateSubquiver = async (
       memberCount: 1,
     });
 
+    // **Step 5: Auto-join the creator**
+    if (!auth.currentUser?.uid) {
+      throw new Error("User is not authenticated.");
+    }
+    await updateDoc(doc(firestore, "users", auth.currentUser.uid), {
+      joinedCommunities: arrayUnion(subquiverId),
+    });
+
     toast({
-      title: "Subquiver created!",
+      title: "Subquiver created & joined!",
+      description: "You have automatically joined this community.",
       status: "success",
       duration: 3000,
       isClosable: true,
     });
+
+    router.reload();
 
     onClose();
   } catch (error: any) {
@@ -87,3 +118,4 @@ export const handleCreateSubquiver = async (
     });
   }
 };
+
