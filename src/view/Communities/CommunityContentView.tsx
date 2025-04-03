@@ -104,7 +104,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, handleVote, setDeleteModal, u
         </HStack>
   
         <Box mx={7} mt={3} p={6} bg="brand.800" borderRadius="md">
-          <Text color="#55828B">{post.description}</Text>
+          <Text color="#F4F4F4">{post.description}</Text>
         </Box>
   
         <Box mt={2} ml={5}>

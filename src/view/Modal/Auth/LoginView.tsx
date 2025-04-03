@@ -72,8 +72,8 @@ const LoginView:React.FC<LoginProps> = () => {
                         ".chakra-checkbox__control": {
                         borderColor: "brand.800",
                         _checked: {
-                            bg: "brand.100",
-                            borderColor: "brand.100",
+                            bg: "brand.800",
+                            borderColor: "brand.800",
                         },
                         },
                     }}

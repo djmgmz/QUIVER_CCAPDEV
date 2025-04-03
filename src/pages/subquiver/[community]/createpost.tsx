@@ -53,7 +53,7 @@ const CreatePostPage = () => {
       onCancel={() => router.back()}
       onCreate={handleCreatePost}
       community={community as string}
-      author={user?.displayName || "Anonymous"}
+      
     />
   );
 };
