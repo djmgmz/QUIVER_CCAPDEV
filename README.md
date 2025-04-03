@@ -105,14 +105,7 @@ To run Quiver locally, you need Node.js installed (https://nodejs.org/).
 ```git clone https://github.com/yourusername/quiver.git```
 ```cd quiver```
 
-2. Make sure there is an .env.local file to set up the environements. The content of the file:
-```NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyAM_EqvHLRBjPcFsb4f8Kpq7k0afWcDp5c
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=quiverccapdevmco.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=quiverccapdevmco
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=quiverccapdevmco.firebasestorage.app
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=215694210674
-NEXT_PUBLIC_FIREBASE_APP_ID=1:215694210674:web:3497e8eebbc21c1e0c34eb
-```
+2. Make sure there is an .env.local file to set up the environments.
 
 2. Install dependencies:
 ```npm init -y```
