@@ -1,10 +1,10 @@
 import React from "react";
-import { Box, Flex, VStack, Text, Avatar, Tabs, TabList, TabPanels, Tab, TabPanel, HStack, Button, Spinner, Divider, Menu, MenuButton, IconButton, MenuList, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
+import { useColorModeValue, Box, Flex, VStack, Text, Avatar, Tabs, TabList, TabPanels, Tab, TabPanel, HStack, Button, Spinner, Divider, Menu, MenuButton, IconButton, MenuList, MenuItem, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay } from "@chakra-ui/react";
 import { BsThreeDots } from "react-icons/bs";
 import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
 import { FaRegComment } from "react-icons/fa";
 import { NextRouter } from 'next/router';
-
+import { useTheme } from "@/view/chakra/themecontext";
 
 interface ProfileDetailsViewProps {
   user: {
@@ -79,6 +79,7 @@ interface ProfileDetailsViewProps {
     setParentPostId,
     router,
   }) => {
+    const { theme } = useTheme();
     return (
       <>
       <Box width="full" position="relative">
@@ -125,13 +126,13 @@ interface ProfileDetailsViewProps {
           </Text>
         </VStack>
   
-        <Tabs variant="solid-rounded" colorScheme="gray" align="start" ml={160} mt={8} px={10}>
+        <Tabs variant="solid-rounded"  align="start" ml={160} mt={8} px={10}>
           <TabList mb={4}>
-            <HStack spacing={250} align="center">
-              <Tab>Posts</Tab>
-              <Tab>Comments</Tab>
-              <Tab>Upvoted</Tab>
-              <Tab>Downvoted</Tab>
+            <HStack spacing={250} align="center" color="yellow">
+              <Tab color={theme[100]} _selected={{ color: theme[200] , bg:theme[300]}}>Posts</Tab>
+              <Tab color={theme[100]} _selected={{ color: theme[200] , bg:theme[300]}}>Comments</Tab>
+              <Tab color={theme[100]} _selected={{ color: theme[200] , bg:theme[300]}}>Upvoted</Tab>
+              <Tab color={theme[100]} _selected={{ color: theme[200] , bg:theme[300]}}>Downvoted</Tab>
             </HStack>
           </TabList>
   
