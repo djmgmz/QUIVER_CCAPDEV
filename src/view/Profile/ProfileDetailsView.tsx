@@ -182,7 +182,8 @@ interface ProfileDetailsViewProps {
                       </VStack>
                       
   
-                      <Menu>
+                      {isCurrentUser && (
+                        <Menu>
                         <MenuButton as={IconButton} icon={<BsThreeDots />} variant="ghost" size="md" color="brand.100" />
                         <MenuList>
                           <MenuItem onClick={() => router.push(`/post/edit/${post.id}?community=${post.community}`)}>
@@ -197,6 +198,7 @@ interface ProfileDetailsViewProps {
                           </MenuItem>
                         </MenuList>
                       </Menu>
+                      )}
                     </HStack>
   
                     <Box mt={2} p={4} bg="brand.800" borderRadius="md">
@@ -254,6 +256,7 @@ interface ProfileDetailsViewProps {
                     <Text fontSize={19} fontWeight={900} color="brand.100">
                       In q/{comment.subquiverName}
                     </Text>
+                    {isCurrentUser && (
                     <Menu>
                       <MenuButton as={IconButton} icon={<BsThreeDots />} variant="ghost" size="md" color="brand.100" />
                       <MenuList>
@@ -272,6 +275,7 @@ interface ProfileDetailsViewProps {
                         </MenuItem>
                       </MenuList>
                     </Menu>
+                    )}
                     </HStack>
                     <Text ml={2} fontSize="xs" fontWeight={600} color="brand.100">
                       {comment.postTitle}
