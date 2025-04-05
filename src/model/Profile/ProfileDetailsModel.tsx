@@ -477,21 +477,25 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
   const onPostUpvote = (postId: string, community: string) => {
     if (!currentUser) return;
     handlePostUpvote(postId, community, currentUser, refreshPostVotes);
+    refreshUserVotes();
   };
   
   const onPostDownvote = (postId: string, community: string) => {
     if (!currentUser) return;
     handlePostDownvote(postId, community, currentUser, refreshPostVotes);
+    refreshUserVotes();
   };
   
   const onCommentUpvote = (commentId: string, postId: string, community: string) => {
     if (!currentUser) return;
     handleCommentUpvote(commentId, postId, community, currentUser, refreshCommentVotes);
+    refreshUserVotes();
   };
   
   const onCommentDownvote = (commentId: string, postId: string, community: string) => {
     if (!currentUser) return;
     handleCommentDownvote(commentId, postId, community, currentUser, refreshCommentVotes);
+    refreshUserVotes();
   };
 
   const [deleteTarget, setDeleteTarget] = useState<{
