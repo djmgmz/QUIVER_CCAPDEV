@@ -1,7 +1,7 @@
 import { firestore } from "@/model/firebase/clientApp";
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, deleteDoc, getDocs, setDoc, collection, writeBatch } from "firebase/firestore";
 import router, { NextRouter } from "next/router";
-import { useToast } from "@chakra-ui/react";
+import { useToast, UseToastOptions } from "@chakra-ui/react";
 import { getStorage, deleteObject, ref } from "firebase/storage";
 
 export const handleJoin = async (user: any, subquiverId: string) => {
@@ -52,10 +52,19 @@ export const handleVote = async (
   user: any,
   subquiverId: string,
   postId: string,
-  type: "upvote" | "downvote"
-): Promise<"added" | "removed" | "switched"> => {
-  if (!user) throw new Error("User not authenticated");
+  type: "upvote" | "downvote",
+  toast: (options: UseToastOptions) => void
+): Promise<"added" | "removed" | "switched" | void> => {
 
+  if (!user) {
+    toast({
+      title: "You must be logged in to interact with posts.",
+      status: "warning",
+      duration: 3000,
+      isClosable: true,
+    });
+    return;
+  }
   const voteRef = doc(firestore, `subquivers/${subquiverId}/posts/${postId}/votes/${user.uid}`);
   const voteDoc = await getDoc(voteRef);
 
@@ -188,6 +197,4 @@ export const handleDeleteSubquiver = async (
 function fetchPosts() {
   throw new Error("Function not implemented.");
 }
-function toast(arg0: { title: string; status: string; duration: number; isClosable: boolean; }) {
-  throw new Error("Function not implemented.");
-}
+
