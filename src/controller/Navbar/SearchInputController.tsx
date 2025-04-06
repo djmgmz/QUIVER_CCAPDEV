@@ -18,6 +18,8 @@ interface Post {
   
     const validCommunities = Array.from(new Set(posts.map((post) => post.community)));
   
+    const communityMatch = term.match(/q\/([^\n]+)/i);
+
     if (!currentFilter) {
       const parts = input.split(" ");
       const communityPart = parts.find(
@@ -29,16 +31,36 @@ interface Post {
         term = parts.filter((p) => p !== communityPart).join(" ");
       }
     }
+
+    if (communityMatch) {
+      const potentialCommunity = communityMatch[1].trim(); 
+  
+      const isValid = validCommunities.some(
+        (comm) => comm.toLowerCase() === potentialCommunity.toLowerCase()
+      );
+  
+      if (isValid) {
+        newFilter = potentialCommunity;
+        term = term.replace(communityMatch[0], "").trim(); 
+      }
+    }
   
     setSearchTerm(term);
     setCommunityFilter(newFilter);
   
     const lowerTerm = term.toLowerCase();
+
     const filtered = posts.filter((post) => {
       const matchesCommunity = !newFilter || post.community === newFilter;
+      const searchText = lowerTerm.replace(/\s+/g, "");
+      const communityText = post.community.replace(/[-_]/g, "").toLowerCase();
+      
       const matchesText =
+
         post.title.toLowerCase().includes(lowerTerm) ||
-        post.description.toLowerCase().includes(lowerTerm);
+        post.description.toLowerCase().includes(lowerTerm) ||
+        communityText.includes(searchText);
+      
       return matchesCommunity && matchesText;
     });
   
