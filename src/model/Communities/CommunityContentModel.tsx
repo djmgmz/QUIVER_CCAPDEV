@@ -239,7 +239,7 @@ const CommunityContent: React.FC<CommunityContentProps> = ({ name, subquiverId }
   };
   
   const onVote = async (postId: string, type: "upvote" | "downvote") => {
-    const result = await vote(user, subquiverId, postId, type);
+    const result = await vote(user, subquiverId, postId, type, toast);
   
     if (result === "added") {
       updateVoteCounts(postId, type, 1);
