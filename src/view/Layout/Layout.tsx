@@ -1,5 +1,5 @@
-import React, { ReactNode } from "react";
-import { Flex, Box, useBreakpointValue } from "@chakra-ui/react";
+import React, { ReactNode, useState, useEffect} from "react";
+import { Flex, Box, useBreakpointValue, Button } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 import Navbar from "@/view/Navbar/Navbar";
 import Sidebar from "@/view/Sidebar/Sidebar";
@@ -7,15 +7,37 @@ import PostsGrid from "@/model/Posts/PostsModel";
 
 interface LayoutProps {
   children: ReactNode;
-  showGrid?: boolean; // This prop is now optional
+  showGrid?: boolean; 
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, showGrid }) => {
-  const router = useRouter(); // ✅ Get current route
+  const router = useRouter(); 
   const showSidebar = useBreakpointValue({ base: false, md: true, lg: true, xl: true });
 
-  // ✅ Automatically show PostsGrid only on the homepage ("/")
+  
   const shouldShowGrid = showGrid ?? router.pathname === "/";
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
+  const handleScroll = () => {
+    if (window.scrollY > 300) {
+      setShowScrollToTop(true);
+    } else {
+      setShowScrollToTop(false);
+    }
+  };
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
   return (
     <>
@@ -27,13 +49,23 @@ const Layout: React.FC<LayoutProps> = ({ children, showGrid }) => {
           </Box>
         )}
 
-        {/* Main content */}
         <Box flex="1" p={4}>
-          {/* ✅ Automatically show PostsGrid only on "/" */}
+          
           {shouldShowGrid && <PostsGrid />}
           {children}
         </Box>
       </Flex>
+      
+      {showScrollToTop && (
+        <Button
+          position="fixed"
+          bottom="50px"
+          right="50px"
+          onClick={scrollToTop}
+        >
+          ▲
+        </Button>
+      )}
     </>
   );
 };
