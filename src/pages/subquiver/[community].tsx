@@ -21,9 +21,9 @@ const CommunityPage: React.FC = () => {
 
       if (!querySnapshot.empty) {
         const doc = querySnapshot.docs[0];
-        return { id: doc.id, ...doc.data() }; // Include both ID and data
+        return { id: doc.id, ...doc.data() }; 
       } else {
-        return null; // Community not found
+        return null; 
       }
     } catch (error) {
       console.error("Error fetching community:", error);
@@ -43,7 +43,6 @@ const CommunityPage: React.FC = () => {
     getCommunity();
   }, [community]);
 
-  // Loading state
   if (loading) {
     return (
       <Box textAlign="center" mt={10}>
