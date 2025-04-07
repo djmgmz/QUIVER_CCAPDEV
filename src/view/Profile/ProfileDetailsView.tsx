@@ -154,6 +154,7 @@ interface ProfileDetailsViewProps {
                     mt={4}
                     maxWidth={1130}
                     onClick={() => router.push(`/post/${post.id}`)}
+                    cursor="pointer"
                   >
                     <HStack justify="space-between" align="start">
                       <VStack align="start">
@@ -253,6 +254,7 @@ interface ProfileDetailsViewProps {
                     mt={4}
                     maxWidth={1130}
                     onClick={() => router.push(`/post/${comment.postId}`)}
+                    cursor="pointer"
                   >
                     <HStack justify="space-between" align="start">
                     <Text fontSize={19} fontWeight={900} color="brand.100">
@@ -325,7 +327,17 @@ interface ProfileDetailsViewProps {
               ) : upvotedItems.length > 0 ? (
                 upvotedItems.map((item) =>
                   item.type === "post" ? (
-                    <Box key={item.id} p={4} border="2px solid" borderColor="black" borderRadius="lg" shadow="md" mt={4} maxWidth={1130} onClick={() => router.push(`/post/${item.id}`)}>
+                    <Box 
+                    key={item.id} 
+                    p={4} 
+                    border="2px solid" 
+                    borderColor="black" 
+                    borderRadius="lg" 
+                    shadow="md" 
+                    mt={4} 
+                    maxWidth={1130} 
+                    onClick={() => router.push(`/post/${item.id}`)} 
+                    cursor="pointer">
                       <Text fontWeight="bold" color="brand.100">
                         {item.title}
                       </Text>
@@ -341,7 +353,16 @@ interface ProfileDetailsViewProps {
                       </Text>
                     </Box>
                   ) : (
-                    <Box key={item.id} p={4} border="2px solid" borderColor="black" borderRadius="lg" shadow="md" mt={4} maxWidth={1130} onClick={() => router.push(`/post/${item.postId}`)}>
+                    <Box key={item.id} 
+                    p={4} 
+                    border="2px solid" 
+                    borderColor="black" 
+                    borderRadius="lg" 
+                    shadow="md" 
+                    mt={4} 
+                    maxWidth={1130} 
+                    onClick={() => router.push(`/post/${item.postId}`)} 
+                    cursor="pointer">
                       <Text fontWeight="bold" color="brand.100">
                         Commented on Post: {item.postTitle}
                       </Text>
@@ -369,7 +390,17 @@ interface ProfileDetailsViewProps {
               ) : downvotedItems.length > 0 ? (
                 downvotedItems.map((item) =>
                   item.type === "post" ? (
-                    <Box key={item.id} p={4} border="2px solid" borderColor="black" borderRadius="lg" shadow="md" mt={4} maxWidth={1130} onClick={() => router.push(`/post/${item.id}`)}>
+                    <Box 
+                    key={item.id} 
+                    p={4} 
+                    border="2px solid" 
+                    borderColor="black" 
+                    borderRadius="lg" 
+                    shadow="md" 
+                    mt={4} 
+                    maxWidth={1130} 
+                    onClick={() => router.push(`/post/${item.id}`)} 
+                    cursor="pointer">
                       <Text fontWeight="bold" color="brand.100">
                         {item.title}
                       </Text>
@@ -385,7 +416,17 @@ interface ProfileDetailsViewProps {
                       </Text>
                     </Box>
                   ) : (
-                    <Box key={item.id} p={4} border="2px solid" borderColor="black" borderRadius="lg" shadow="md" mt={4} maxWidth={1130} onClick={() => router.push(`/post/${item.postId}`)}>
+                    <Box 
+                    key={item.id} 
+                    p={4} 
+                    border="2px solid" 
+                    borderColor="black" 
+                    borderRadius="lg" 
+                    shadow="md" 
+                    mt={4} 
+                    maxWidth={1130} 
+                    onClick={() => router.push(`/post/${item.postId}`)} 
+                    cursor="pointer">
                       <Text fontWeight="bold" color="brand.100">
                         Commented on Post: {item.postTitle}
                       </Text>
