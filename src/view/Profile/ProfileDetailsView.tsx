@@ -185,6 +185,7 @@ interface ProfileDetailsViewProps {
                       
   
                       {isCurrentUser && (
+                        <Box onClick={(e) => e.stopPropagation()}>
                         <Menu>
                         <MenuButton as={IconButton} icon={<BsThreeDots />} variant="ghost" size="md" color="brand.100" />
                         <MenuList>
@@ -200,6 +201,7 @@ interface ProfileDetailsViewProps {
                           </MenuItem>
                         </MenuList>
                       </Menu>
+                      </Box>
                       )}
                     </HStack>
   
@@ -211,7 +213,8 @@ interface ProfileDetailsViewProps {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handlePostUpvote(post.id, post.subquiverId)}
+                        onClick={(e) => {e.stopPropagation(); 
+                               handlePostUpvote(post.id, post.subquiverId)}}
                         leftIcon={<BiSolidUpvote />}
                       >
                         {post.upvotes}
@@ -219,7 +222,8 @@ interface ProfileDetailsViewProps {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handlePostDownvote(post.id, post.subquiverId)}
+                        onClick={(e) => {e.stopPropagation(); 
+                           handlePostDownvote(post.id, post.subquiverId)}}
                         leftIcon={<BiSolidDownvote />}
                       >
                         {post.downvotes}
@@ -261,6 +265,7 @@ interface ProfileDetailsViewProps {
                       In q/{comment.subquiverName}
                     </Text>
                     {isCurrentUser && (
+                    <Box onClick={(e) => e.stopPropagation()}>  
                     <Menu>
                       <MenuButton as={IconButton} icon={<BsThreeDots />} variant="ghost" size="md" color="brand.100" />
                       <MenuList>
@@ -279,6 +284,7 @@ interface ProfileDetailsViewProps {
                         </MenuItem>
                       </MenuList>
                     </Menu>
+                    </Box>
                     )}
                     </HStack>
                     <Text ml={2} fontSize="xs" fontWeight={600} color="brand.100">
@@ -296,9 +302,9 @@ interface ProfileDetailsViewProps {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
+                        onClick={(e) => {e.stopPropagation(); 
                           handleCommentUpvote(comment.id, comment.postId, comment.subquiverId)
-                        }
+                        }}
                         leftIcon={<BiSolidUpvote />}
                       >
                         {comment.upvotes}
@@ -307,9 +313,9 @@ interface ProfileDetailsViewProps {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
+                        onClick={(e) => {e.stopPropagation(); 
                           handleCommentDownvote(comment.id, comment.postId, comment.subquiverId)
-                        }
+                        }}
                         leftIcon={<BiSolidDownvote />}
                       >
                         {comment.downvotes}

@@ -69,6 +69,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, handleVote, setDeleteModal, u
         borderColor="black"
         borderRadius="lg"
         shadow="md"
+        onClick={handleViewPost}
+        cursor="pointer"
       >
         <HStack justify="space-between">
           <HStack>
@@ -92,6 +94,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, handleVote, setDeleteModal, u
           </HStack>
   
           {user?.uid === post.author && (
+            <Box onClick={(e) => e.stopPropagation()}>
             <Menu>
               <MenuButton as={IconButton} icon={<BsThreeDots />} variant="ghost" size="md" color="brand.100" />
               <MenuList>
@@ -99,6 +102,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, handleVote, setDeleteModal, u
                 <MenuItem onClick={() => setDeleteModal({ open: true, postId: post.id })}>Delete</MenuItem>
               </MenuList>
             </Menu>
+            </Box>
           )}
         </HStack>
   
@@ -111,7 +115,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, handleVote, setDeleteModal, u
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleVote(post.id, "upvote")}
+            onClick={(e) => {e.stopPropagation(); 
+                                               handleVote(post.id, "upvote")}}
             leftIcon={post.userVote === "upvote" ? <BiSolidUpvote size={16} /> : <BiUpvote size={16} />}
           >
             <Text fontSize="xs">{post.upvotes}</Text>
@@ -120,7 +125,8 @@ const PostCard: React.FC<PostCardProps> = ({ post, handleVote, setDeleteModal, u
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleVote(post.id, "downvote")}
+            onClick={(e) => {e.stopPropagation();
+                                               handleVote(post.id, "downvote")}}
             leftIcon={post.userVote === "downvote" ? <BiSolidDownvote size={16} /> : <BiDownvote size={16} />}
           >
             <Text fontSize="xs">{post.downvotes}</Text>
