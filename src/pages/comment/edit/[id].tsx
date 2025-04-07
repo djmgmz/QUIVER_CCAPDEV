@@ -29,7 +29,6 @@ const EditCommentPage = () => {
       }
 
       try {
-        // Fetch Comment Data
         const commentRef = doc(
           firestore,
           `subquivers/${communityId}/posts/${postId}/comments/${id}`
@@ -45,7 +44,6 @@ const EditCommentPage = () => {
         setComment(commentData);
         setEditedContent(commentData.content);
 
-        // Fetch Post Data
         const postRef = doc(firestore, `subquivers/${communityId}/posts/${postId}`);
         const postSnapshot = await getDoc(postRef);
 
@@ -57,17 +55,14 @@ const EditCommentPage = () => {
         const postData = postSnapshot.data();
         setPost(postData);
 
-        // Fetch Community (Subquiver) Name
         const communityRef = doc(firestore, `subquivers/${communityId}`);
         const communitySnapshot = await getDoc(communityRef);
         setCommunityName(communitySnapshot.exists() ? communitySnapshot.data().name : "Unknown Subquiver");
 
-        // Fetch Comment Author Username
         const commentAuthorRef = doc(firestore, `users/${commentData.author}`);
         const commentAuthorSnapshot = await getDoc(commentAuthorRef);
         setAuthorUsername(commentAuthorSnapshot.exists() ? commentAuthorSnapshot.data().username : "Unknown User");
 
-        // Fetch Post Author Username
         const postAuthorRef = doc(firestore, `users/${postData.author}`);
         const postAuthorSnapshot = await getDoc(postAuthorRef);
         setPostAuthorUsername(postAuthorSnapshot.exists() ? postAuthorSnapshot.data().username : "Unknown User");

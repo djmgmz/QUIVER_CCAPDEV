@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { Box, Text, useToast } from "@chakra-ui/react";
+import { Text, useToast } from "@chakra-ui/react";
 import { doc, getDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { firestore } from "@/model/firebase/clientApp";
 import EditPost from "@/model/Posts/EditPostModel";
@@ -19,7 +19,6 @@ const EditPostPage: React.FC = () => {
       if (!id || !community) return;
 
       try {
-        // Step 1: Find the subquiver ID by the community name
         const subquiverQuery = query(
           collection(firestore, "subquivers"),
           where("name", "==", community)
@@ -33,7 +32,6 @@ const EditPostPage: React.FC = () => {
 
         const subquiverId = subquiverSnapshot.docs[0].id;
 
-        // Step 2: Fetch the post by ID
         const postRef = doc(firestore, "subquivers", subquiverId, "posts", id as string);
         const postSnap = await getDoc(postRef);
 
