@@ -1,7 +1,7 @@
 import { firestore } from "@/model/firebase/clientApp";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
-import { castVote } from "@/model/Profile/ProfileDetailsModel"; // default import
-import { User } from "firebase/auth"; // For typing currentUser
+import { castVote } from "@/model/Profile/ProfileDetailsModel";
+import { User } from "firebase/auth";
 
 export const handlePostUpvote = (
   postId: string,
@@ -17,7 +17,7 @@ export const handlePostUpvote = (
     commentId: null,
     currentUser,
     fetchPostVotes: () => fetchVotes(postId, community),
-    refreshCommentVotes: () => Promise.resolve(), // No comment to refresh
+    refreshCommentVotes: () => Promise.resolve(),
   });
 };
 
@@ -35,7 +35,7 @@ export const handlePostDownvote = (
     commentId: null,
     currentUser,
     fetchPostVotes: () => fetchVotes(postId, community),
-    refreshCommentVotes: () => Promise.resolve(), // No comment to refresh
+    refreshCommentVotes: () => Promise.resolve(),
   });
 };
 
@@ -53,7 +53,7 @@ export const handleCommentUpvote = (
     communityId: community,
     commentId,
     currentUser,
-    fetchPostVotes: () => Promise.resolve(), // No post refresh needed
+    fetchPostVotes: () => Promise.resolve(),
     refreshCommentVotes: () => refreshCommentVotes(commentId, postId, community),
   });
 };
@@ -72,7 +72,7 @@ export const handleCommentDownvote = (
     communityId: community,
     commentId,
     currentUser,
-    fetchPostVotes: () => Promise.resolve(), // No post refresh needed
+    fetchPostVotes: () => Promise.resolve(),
     refreshCommentVotes: () => refreshCommentVotes(commentId, postId, community),
   });
 };
@@ -94,7 +94,6 @@ export const handleDelete = async (
   
     try {
       if (isDeletingComment) {
-        // Delete Comment and its Votes
         const votesRef = collection(
           firestore,
           `subquivers/${currentSubquiverId}/posts/${parentPostId}/comments/${deleteModal.postId}/votes`
@@ -119,7 +118,6 @@ export const handleDelete = async (
         });
   
       } else {
-        // Delete Post and its Comments and Votes
         const commentsRef = collection(
           firestore,
           `subquivers/${currentSubquiverId}/posts/${deleteModal.postId}/comments`
@@ -133,15 +131,13 @@ export const handleDelete = async (
           await deleteDoc(comment.ref);
         }
   
-        // Delete post votes
         const votesRef = collection(
           firestore,
           `subquivers/${currentSubquiverId}/posts/${deleteModal.postId}/votes`
         );
         const votesSnapshot = await getDocs(votesRef);
         votesSnapshot.forEach((vote) => deleteDoc(vote.ref));
-  
-        // Delete the post itself
+
         await deleteDoc(
           doc(firestore, `subquivers/${currentSubquiverId}/posts/${deleteModal.postId}`)
         );
@@ -160,5 +156,5 @@ export const handleDelete = async (
     }
   
     setDeleteModal({ open: false, postId: null });
-    setIsDeletingComment(false); // Reset local state
+    setIsDeletingComment(false);
   };

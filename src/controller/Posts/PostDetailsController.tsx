@@ -4,17 +4,13 @@ import {
     doc,
     getDoc,
     getDocs,
-    orderBy,
-    query,
     serverTimestamp,
     setDoc,
     addDoc,
-    onSnapshot
   } from "firebase/firestore";
   import { firestore } from "@/model/firebase/clientApp";
   import router, { NextRouter } from "next/router";
   import { UseToastOptions } from "@chakra-ui/react";
-  import { auth } from '@/model/firebase/clientApp';
   
   export const handleDeletePost = async (
     post: any,

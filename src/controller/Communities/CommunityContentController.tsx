@@ -1,7 +1,7 @@
 import { firestore } from "@/model/firebase/clientApp";
 import { doc, updateDoc, arrayUnion, arrayRemove, getDoc, deleteDoc, getDocs, setDoc, collection, writeBatch } from "firebase/firestore";
 import router, { NextRouter } from "next/router";
-import { useToast, UseToastOptions } from "@chakra-ui/react";
+import { UseToastOptions } from "@chakra-ui/react";
 import { getStorage, deleteObject, ref } from "firebase/storage";
 
 export const handleJoin = async (user: any, subquiverId: string) => {
@@ -83,7 +83,6 @@ export const handleVote = async (
   }
 };
 
-// Refactored editSubquiver function
 export const handleEditSubquiver = async (
   communityId: string, 
   newName: string, 
@@ -93,14 +92,12 @@ export const handleEditSubquiver = async (
   router: NextRouter,
 ) => {
   try {
-    // Update the community name and description in Firestore
     const communityRef = doc(firestore, "subquivers", communityId);
     await updateDoc(communityRef, {
       name: newName,
       description: newDescription,
     });
 
-    // Call the toastCallback with a success message
     toastCallback({
       title: "Community updated successfully!",
       status: "success",
@@ -108,18 +105,15 @@ export const handleEditSubquiver = async (
       isClosable: true,
     });
 
-    // Reload posts or perform any other necessary action
     await fetchPosts();
 
-    // Reload the page first, then navigate to home after a short delay
     router.reload();
     setTimeout(() => {
-      router.replace("/"); // Ensure smooth transition back to home
+      router.replace("/");
     }, 100);
 
   } catch (error) {
     console.error("Error updating community:", error);
-    // Call the toastCallback with an error message
     toastCallback({
       title: "Failed to update community",
       status: "error",
@@ -192,9 +186,4 @@ export const handleDeleteSubquiver = async (
     });
   }
 };
-
-
-function fetchPosts() {
-  throw new Error("Function not implemented.");
-}
 

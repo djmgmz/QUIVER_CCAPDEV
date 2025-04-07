@@ -1,4 +1,4 @@
-import { addDoc, arrayUnion, collection, doc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
+import { arrayUnion, collection, doc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { auth, firestore, storage } from "@/model/firebase/clientApp";
 import router from "next/router";
@@ -43,7 +43,6 @@ export const handleCreateSubquiver = async (
     const creatorId = auth.currentUser?.uid;
     const timestamp = serverTimestamp();
 
-    // **Step 1: Check if a subquiver with the same name already exists**
     const subquiversRef = collection(firestore, "subquivers");
     const q = query(subquiversRef, where("name", "==", communityName));
     const existingSubquivers = await getDocs(q);
@@ -59,13 +58,11 @@ export const handleCreateSubquiver = async (
       return;
     }
 
-    // **Step 2: Check if the user is already a member of the subquiver**
     const subquiverId = doc(subquiversRef).id;
 
     let bannerImageURL = "";
     let iconImageURL = "";
 
-   // **Step 3: Upload the banner and icon images to Firebase Storage**
     if (bannerFile) {
       const bannerRef = ref(storage, `subquivers/${subquiverId}/banner`);
       const bannerSnap = await uploadBytes(bannerRef, bannerFile);
@@ -78,7 +75,6 @@ export const handleCreateSubquiver = async (
       iconImageURL = await getDownloadURL(iconSnap.ref);
     }
 
-    // **Step 4: Create the subquiver document in Firestore**
     await setDoc(doc(firestore, "subquivers", subquiverId), {
       name: communityName,
       description,
@@ -89,7 +85,6 @@ export const handleCreateSubquiver = async (
       memberCount: 1,
     });
 
-    // **Step 5: Auto-join the creator**
     if (!auth.currentUser?.uid) {
       throw new Error("User is not authenticated.");
     }

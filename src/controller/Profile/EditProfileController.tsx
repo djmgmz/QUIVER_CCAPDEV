@@ -1,6 +1,5 @@
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { ref, uploadString, getDownloadURL } from "firebase/storage";
-import { storage, firestore } from "@/model/firebase/clientApp";
+import { firestore } from "@/model/firebase/clientApp";
 import { uploadImageToStorage } from "../UploadImage/uploadImageToStorage";
 import { NextRouter } from "next/router";
 
