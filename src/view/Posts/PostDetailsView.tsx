@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Text,
@@ -10,7 +10,6 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  useToast,
   chakra,
   Input,
   InputGroup,
@@ -173,9 +172,9 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
             ? {
                 content: '""',
                 position: "absolute",
-                top: "16px", // vertical position of elbow
+                top: "16px", 
                 left: "-4px",
-                width: "16px", // horizontal part of L
+                width: "16px", 
                 borderTop: "2px solid",
                 borderColor: transparentize("brand.100", 0.5),
               }
@@ -319,7 +318,6 @@ const PostDetailsView: React.FC<PostDetailsViewProps> = ({
           </Box>
         )}
 
-         {/* 🔁 Recursively render replies if any */}
         {comment.replies && comment.replies.length > 0 && (
           <VStack mt={2} spacing={2} align="stretch">
             {comment.replies.map((reply) => (

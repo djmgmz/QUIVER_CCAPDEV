@@ -24,7 +24,6 @@ import { BiSolidUpvote } from "react-icons/bi";
 import { BiSolidDownvote } from "react-icons/bi";
 import { BiUpvote } from "react-icons/bi";
 import { BiDownvote } from "react-icons/bi";
-import { auth } from "@/model/firebase/clientApp";
 import { handleDeleteSubquiver, handleEditSubquiver } from "@/controller/Communities/CommunityContentController";
 import EditSubquiverModalView from "@/view/Modal/EditSubquiverModalView"; 
 import DeleteSubquiverModalView from "@/view/Modal/DeleteSubquiverModalView"; 
@@ -183,9 +182,6 @@ const CommunityContentView: React.FC<CommunityContentViewProps> = ({
   handleConfirmDelete,
   setDeleteModal,
   fetchPosts,
-  checkMembership,
-  updateVoteCounts,
-  updateUserVote,
   user,
   communityId,
   description,

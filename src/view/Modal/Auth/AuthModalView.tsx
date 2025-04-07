@@ -36,7 +36,6 @@ const AuthModalView:React.FC = () => {
                         OR
                     </Text>
                     <AuthInputs />
-                    {/* <ResetPassword /> */}
                 </Flex>
             </ModalBody>
             </ModalContent>

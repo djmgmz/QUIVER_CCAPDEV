@@ -15,7 +15,6 @@ const Navbar: React.FC = () => {
         <QuiverIcon />
         <QuiverText />
       </Flex>
-      {/* <Directory /> */}
       <SearchInput />
       <RightContent user={user}/>
     </Flex>

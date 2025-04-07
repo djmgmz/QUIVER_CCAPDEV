@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
   Box,
   Text,
   VStack,
   HStack,
-  Image,
-  Avatar,
-  useToast,
   Input,
   Textarea,
   Button,
@@ -20,8 +17,6 @@ import {
   ModalHeader,
   ModalOverlay,
 } from "@chakra-ui/react";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { auth, firestore } from "@/model/firebase/clientApp";
 import { FaImage } from "react-icons/fa6";
 
 interface CreateSubquiverModalViewProps {
