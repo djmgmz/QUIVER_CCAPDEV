@@ -98,13 +98,6 @@ export const handleEditSubquiver = async (
       description: newDescription,
     });
 
-    toastCallback({
-      title: "Community updated successfully!",
-      status: "success",
-      duration: 3000,
-      isClosable: true,
-    });
-
     await fetchPosts();
 
     router.reload();
