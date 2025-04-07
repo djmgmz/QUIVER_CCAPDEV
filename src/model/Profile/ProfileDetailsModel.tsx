@@ -338,8 +338,8 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
       setLoadingVotes(true);
   
       try {
-        const upvotedData = await fetchVotesByType("upvote");
-        const downvotedData = await fetchVotesByType("downvote");
+        const upvotedData = await fetchVotesByType("upvote", user.uid);
+        const downvotedData = await fetchVotesByType("downvote", user.uid);
   
         setUpvotedItems(upvotedData);
         setDownvotedItems(downvotedData);
@@ -351,9 +351,9 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
     };
   
     fetchUserVotes();
-  }, [user.uid]);
+  }, [user.uid]);  
   
-  const fetchVotesByType = async (voteType: "upvote" | "downvote") => {
+  const fetchVotesByType = async (voteType: "upvote" | "downvote", userId: string) => {
     const votesQuery = query(
       collectionGroup(firestore, "votes"),
       where("type", "==", voteType)
@@ -363,7 +363,7 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
   
     const results = await Promise.all(
       voteSnapshots.docs
-        .filter((voteDoc) => voteDoc.id === currentUser?.uid)
+        .filter((voteDoc) => voteDoc.id === userId)
         .map(async (voteDoc) => {
           const votePath = voteDoc.ref.path;
           const parts = votePath.split("/");
@@ -464,9 +464,9 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
   
   const refreshUserVotes = async () => {
     try {
-      const upvotedData = await fetchVotesByType("upvote");
-      const downvotedData = await fetchVotesByType("downvote");
-
+      const upvotedData = await fetchVotesByType("upvote", user.uid);
+      const downvotedData = await fetchVotesByType("downvote", user.uid);
+  
       setUpvotedItems(upvotedData);
       setDownvotedItems(downvotedData);
     } catch (error) {
