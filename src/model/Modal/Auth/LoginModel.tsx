@@ -28,7 +28,6 @@ export const useLoginModel = () => {
 
       console.log(error);
 
-    //Firebase logic
     const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
       

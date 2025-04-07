@@ -1,23 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
-  Box,
-  Text,
-  Avatar,
-  Button,
-  IconButton,
-  HStack,
-  VStack,
-  Icon,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Divider,
-  useToast,
-  Spinner,
+  useToast
 } from "@chakra-ui/react";
-import { BsThreeDots } from "react-icons/bs";
-import { FaPlus, FaRegComment } from "react-icons/fa";
 import { useSetRecoilState, useRecoilState } from "recoil";
 import { authModalState } from "@/model/atoms/authModalAtom";
 import { deletePostModalState } from "@/model/atoms/deletePostModalAtom";
@@ -27,17 +11,10 @@ import {
   query,
   orderBy,
   getDocs,
-  deleteDoc,
   doc,
   getDoc,
-  updateDoc,
-  arrayUnion,
-  arrayRemove,
-  setDoc,
-  where,
 } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { BiDownvote, BiSolidDownvote, BiSolidUpvote, BiUpvote } from "react-icons/bi";
 import CommunityContentView from "@/view/Communities/CommunityContentView";
 import {
   handleJoin as join,

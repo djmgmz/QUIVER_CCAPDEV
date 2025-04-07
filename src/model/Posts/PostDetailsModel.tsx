@@ -1,30 +1,12 @@
 import React, { useState, useEffect } from "react";
 import {
-  Box,
-  Text,
-  HStack,
-  VStack,
-  Button,
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  useToast,
-  chakra,
-  Input,
-  InputGroup,
+  useToast
 } from "@chakra-ui/react";
-import { BiSolidUpvote, BiSolidDownvote, BiDownvote, BiUpvote } from "react-icons/bi";
-import { BsThreeDots } from "react-icons/bs";
 import { useRouter } from "next/router";
-import DeletePost from "@/view/Modal/DeletePost";
 import { firestore } from "@/model/firebase/clientApp";
-import { doc, getDoc, collection, addDoc, serverTimestamp, getDocs, orderBy, query, setDoc, deleteDoc } from "firebase/firestore";
-import { FaRegComments } from "react-icons/fa6";
+import { doc, getDoc, collection, getDocs, orderBy, query } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/model/firebase/clientApp";
-import { getAuth } from "firebase/auth";
 import PostDetailsView from "@/view/Posts/PostDetailsView";
 import {
   handleDeletePost,

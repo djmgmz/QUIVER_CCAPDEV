@@ -1,7 +1,5 @@
 import { authModalState } from '@/model/atoms/authModalAtom';
 import { auth, firestore } from '@/model/firebase/clientApp';
-import { FIREBASE_ERRORS } from '@/model/firebase/errors';
-import { Text, Input, Button, Flex } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import { useSetRecoilState } from 'recoil';
 import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';

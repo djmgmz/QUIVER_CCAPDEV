@@ -1,26 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
-  Text,
-  Button,
-  Flex,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Input,
-  Textarea,
-  Box,
-  VStack,
-  HStack,
-  IconButton,
   useToast,
 } from "@chakra-ui/react";
-import { FaImage } from "react-icons/fa";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { auth, firestore } from "@/model/firebase/clientApp";
 import CreateSubquiverModalView from "@/view/Modal/CreateSubquiverModalView";
 import {
   handleNext as handleNextFn,

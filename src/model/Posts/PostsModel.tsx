@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Box,
   useToast,
 } from "@chakra-ui/react";
 import {
@@ -44,7 +43,7 @@ const PostsGrid: React.FC = () => {
     const now = new Date();
     const createdAt = timestamp.toDate();
     const diffMs = now.getTime() - createdAt.getTime();
-    return diffMs / (1000 * 60 * 60 * 24); // days
+    return diffMs / (1000 * 60 * 60 * 24); 
   };
 
   const isWithinPeriod = (timestamp: Timestamp | null, period: "today" | "week" | "month") => {

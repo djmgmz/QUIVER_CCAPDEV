@@ -1,19 +1,9 @@
 import React, { useEffect, useState } from "react";
 import ProfileDetailsView from "@/view/Profile/ProfileDetailsView";
 import { 
-  Box, Text, Avatar, VStack, HStack, Button, Tab, TabList, TabPanel, TabPanels, Tabs, Flex, Divider, 
-  IconButton,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
-  useToast,
+  useToast
 } from "@chakra-ui/react";
-import { FaPlus } from "react-icons/fa";
 import { useRouter } from "next/router";
-import { BiSolidUpvote, BiSolidDownvote } from "react-icons/bi";
-import { FaRegComment } from "react-icons/fa6";
-import { Spinner } from "@chakra-ui/react";
 import { auth, firestore } from "@/model/firebase/clientApp";
 import {
   collectionGroup,
@@ -26,10 +16,8 @@ import {
   setDoc,
   deleteDoc,
 } from "firebase/firestore";
-import { BsThreeDots } from "react-icons/bs";
 import { deletePostModalState } from "@/model/atoms/deletePostModalAtom";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { authModalState } from "@/model/atoms/authModalAtom";
+import { useRecoilState } from "recoil";
 import {
   handlePostUpvote,
   handlePostDownvote,
@@ -44,7 +32,7 @@ export type CastVoteParams = {
   postId: string;
   communityId: string;
   commentId: string | null;
-  currentUser: any; // or User
+  currentUser: any; 
   fetchPostVotes: () => Promise<void>;
   refreshCommentVotes: (commentId: string) => Promise<void>;
 };
@@ -71,14 +59,11 @@ export const castVote = async ({
       const existingVote = voteDoc.data().type;
 
       if (existingVote === type) {
-        // same vote clicked again → remove
         await deleteDoc(voteRef);
       } else {
-        // different vote → update it
         await setDoc(voteRef, { type });
       }
     } else {
-      // no vote yet → add it
       await setDoc(voteRef, { type });
     }
 
@@ -93,8 +78,6 @@ export const castVote = async ({
   }
 };
 
-
-
 interface ProfileDetailsProps {
   user: {
     uid: string;
@@ -108,26 +91,13 @@ interface ProfileDetailsProps {
 
 const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) => {
   const router = useRouter();
-  const { uid } = router.query;
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [profileUser, setProfileUser] = useState<any>(null);
   const [comments, setComments] = useState<any[]>([]);
   const [commentsLoading, setCommentsLoading] = useState(true); 
   const [deleteModal, setDeleteModal] = useRecoilState(deletePostModalState);
-  const [upvoted, setUpvoted] = useState(false);
-  const [downvoted, setDownvoted] = useState(false);
-  const [postVotes, setPostVotes] = useState({ upvotes: 0, downvotes: 0 });
-    const [commentVotes, setCommentVotes] = useState<{ [key: string]: { upvoted: boolean, downvoted: boolean } }>(
-      comments.reduce((acc, comment) => {
-        acc[comment.id] = { upvoted: false, downvoted: false };
-        return acc;
-      }, {} as { [key: string]: { upvoted: boolean, downvoted: boolean } })
-    );
   const currentUser = auth.currentUser;
-  const setAuthModal = useSetRecoilState(authModalState);
   const toast = useToast();
-
   const [upvotedItems, setUpvotedItems] = useState<any[]>([]);
   const [downvotedItems, setDownvotedItems] = useState<any[]>([]);
   const [loadingVotes, setLoadingVotes] = useState(true);
@@ -521,14 +491,6 @@ const ProfileDetails: React.FC<ProfileDetailsProps> = ({ user, isCurrentUser }) 
     );
   };
   
-  
-  const onDelete = (postId: string, isComment: boolean, community: string, parentId?: string) => {
-    setDeleteTarget({ postId, isComment, community, parentId });
-    setDeleteModal({ open: true, postId }); // trigger modal
-  };
-  
-  
-
   return (
     <ProfileDetailsView
       user={{

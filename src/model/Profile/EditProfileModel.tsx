@@ -1,21 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Input,
-  Text,
-  Textarea,
-  VStack,
-  Flex,
-  Spinner,
-  Icon,
-  Avatar,
-  Button,
-} from "@chakra-ui/react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
-import { FaPlus } from "react-icons/fa";
-import { auth, firestore } from "@/model/firebase/clientApp";
-import { Image } from "@chakra-ui/react";
+import { auth } from "@/model/firebase/clientApp";
 import EditProfileView from "@/view/Profile/EditProfileView";
 import {
   fetchProfile,

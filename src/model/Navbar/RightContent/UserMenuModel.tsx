@@ -1,4 +1,4 @@
-import { signOut, User } from 'firebase/auth';
+import { User } from 'firebase/auth';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useToast } from '@chakra-ui/react';

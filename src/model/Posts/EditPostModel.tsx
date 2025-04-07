@@ -1,17 +1,4 @@
 import React from "react";
-import {
-  Box,
-  Text,
-  Input,
-  Textarea,
-  Button,
-  VStack,
-  HStack,
-  Avatar,
-  Flex,
-  useToast,
-} from "@chakra-ui/react";
-import useUsername from "@/model/hooks/useUsername";
 import EditPostView from "@/view/Posts/EditPostView";
 
 interface EditPostProps {
